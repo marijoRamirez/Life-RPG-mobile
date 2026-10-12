@@ -7,7 +7,16 @@ import {
   View,
 } from "react-native";
 
+import {
+  CheckIcon,
+  ClothesIcon,
+  FocusIcon,
+  MoonIcon,
+  PixelIcon,
+} from "@/components/ui/PixelIcons";
+
 // Importamos los estilos separados
+import { BottomNav } from "@/components/ui/BottomNav";
 import { styles } from "./styles/index.styles";
 
 export default function HUDPrincipalScreen() {
@@ -25,7 +34,7 @@ export default function HUDPrincipalScreen() {
             </View>
           </View>
           <View style={styles.toggleButton}>
-            <Text style={styles.toggleIcon}>🌙</Text>
+            <MoonIcon size={16} color="#FFFFFF" />
           </View>
         </View>
         <View style={styles.card}>
@@ -90,19 +99,19 @@ export default function HUDPrincipalScreen() {
         <View style={styles.attributesContainer}>
           <AttributeBar
             label="Puntos de Cultura"
-            icon="📖"
+            icon="book-open"
             value="340"
             progress="70%"
           />
           <AttributeBar
             label="Puntos Físicos"
-            icon="🏋️"
+            icon="dumbbell"
             value="210"
             progress="40%"
           />
           <AttributeBar
             label="Puntos de Enfoque"
-            icon="🎯"
+            icon="focus"
             value="480"
             progress="90%"
           />
@@ -112,34 +121,27 @@ export default function HUDPrincipalScreen() {
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: "#4CAF50" }]}
           >
-            <Text style={[styles.actionButtonText, { color: "#000" }]}>
-              ✓ Check-in
+            <Text style={[styles.actionButtonText, { color: "#FFFFFF" }]}>
+              <CheckIcon size={16} color="#FFFFFF" /> Check-in
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: "#2A2A35" }]}
           >
             <Text style={[styles.actionButtonText, { color: "#FFF" }]}>
-              ◎ Enfocar
+              <FocusIcon size={16} color="#FFFFFF" /> Enfocar
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: "#9C27B0" }]}
           >
             <Text style={[styles.actionButtonText, { color: "#FFF" }]}>
-              👕 Vestidor
+              <ClothesIcon size={16} color="#FFFFFF" /> Vestidor
             </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
-
-      <View style={styles.bottomNav}>
-        <NavItem icon="🏠" label="Casa" active />
-        <NavItem icon="✓" label="Hábitos" />
-        <NavItem icon="🚩" label="Misiones" />
-        <NavItem icon="🛍️" label="Tienda" />
-        <NavItem icon="🏆" label="Progreso" />
-      </View>
+      <BottomNav activeTab="home" />
     </SafeAreaView>
   );
 }
@@ -151,13 +153,13 @@ const AttributeBar = ({
   progress,
 }: {
   label: string;
-  icon: string;
+  icon: React.ComponentProps<typeof PixelIcon>["name"] | React.ReactNode;
   value: string;
   progress: string;
 }) => (
   <View style={styles.attributeRow}>
     <View style={styles.attributeIconBox}>
-      <Text>{icon}</Text>
+      <PixelIcon name={icon as any} size={24} color="#FFFFFF" />
     </View>
     <View style={styles.attributeContent}>
       <View style={styles.attributeTextRow}>
