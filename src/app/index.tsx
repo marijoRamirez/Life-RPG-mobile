@@ -1,98 +1,187 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  Image,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+// Importamos los estilos separados
+import { styles } from "./styles/index.styles";
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+export default function HUDPrincipalScreen() {
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <View style={styles.headerProfile}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}></Text>
+            </View>
+            <View>
+              <Text style={styles.dateText}>Jueves 8 de octubre</Text>
+              <Text style={styles.greetingText}>Hola, Yess</Text>
+            </View>
+          </View>
+          <View style={styles.toggleButton}>
+            <Text style={styles.toggleIcon}>🌙</Text>
+          </View>
+        </View>
+        <View style={styles.card}>
+          <View style={styles.levelRow}>
+            <View style={styles.levelBadge}>
+              <Text style={styles.levelLabel}>LV</Text>
+              <Text style={styles.levelNumber}>14</Text>
+            </View>
+            <View style={styles.nameContainer}>
+              <Text style={styles.mascotaName}>
+                Susi Botitas · Guardián del Enfoque
+              </Text>
+              <Text style={styles.xpText}>1240 / 1800 XP para nivel 15</Text>
+            </View>
+          </View>
+
+          <View style={styles.barRow}>
+            <Text style={styles.barIcon}>HP</Text>
+            <View style={styles.barBackground}>
+              <View
+                style={[
+                  styles.barFill,
+                  { backgroundColor: "#4CAF50", width: "82%" },
+                ]}
+              />
+            </View>
+            <Text style={styles.barValue}>82/100</Text>
+          </View>
+
+          <View style={styles.barRow}>
+            <Text style={styles.barIcon}>XP</Text>
+            <View style={styles.barBackground}>
+              <View
+                style={[
+                  styles.barFill,
+                  { backgroundColor: "#FFC107", width: "69%" },
+                ]}
+              />
+            </View>
+            <Text style={styles.barValue}>69%</Text>
+          </View>
+        </View>
+
+        <View style={styles.tamagotchiCard}>
+          <View style={styles.habitatBadge}>
+            <Text style={styles.habitatText}>Hábitat del bosque</Text>
+          </View>
+
+          <View style={styles.speechBubble}>
+            <Text style={styles.speechText}>
+              ¿Cómo te sientes{"\n"}hoy? Toca para{"\n"}contarme.
+            </Text>
+          </View>
+
+          <Image
+            source={require("../../assets/images/gato.png")}
+            style={{ width: 128, height: 128 }}
+            resizeMode="contain"
+          />
+        </View>
+
+        <View style={styles.attributesContainer}>
+          <AttributeBar
+            label="Puntos de Cultura"
+            icon="📖"
+            value="340"
+            progress="70%"
+          />
+          <AttributeBar
+            label="Puntos Físicos"
+            icon="🏋️"
+            value="210"
+            progress="40%"
+          />
+          <AttributeBar
+            label="Puntos de Enfoque"
+            icon="🎯"
+            value="480"
+            progress="90%"
+          />
+        </View>
+
+        <View style={styles.actionsRow}>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: "#4CAF50" }]}
+          >
+            <Text style={[styles.actionButtonText, { color: "#000" }]}>
+              ✓ Check-in
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: "#2A2A35" }]}
+          >
+            <Text style={[styles.actionButtonText, { color: "#FFF" }]}>
+              ◎ Enfocar
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: "#9C27B0" }]}
+          >
+            <Text style={[styles.actionButtonText, { color: "#FFF" }]}>
+              👕 Vestidor
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+
+      <View style={styles.bottomNav}>
+        <NavItem icon="🏠" label="Casa" active />
+        <NavItem icon="✓" label="Hábitos" />
+        <NavItem icon="🚩" label="Misiones" />
+        <NavItem icon="🛍️" label="Tienda" />
+        <NavItem icon="🏆" label="Progreso" />
+      </View>
+    </SafeAreaView>
   );
 }
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+const AttributeBar = ({
+  label,
+  icon,
+  value,
+  progress,
+}: {
+  label: string;
+  icon: string;
+  value: string;
+  progress: string;
+}) => (
+  <View style={styles.attributeRow}>
+    <View style={styles.attributeIconBox}>
+      <Text>{icon}</Text>
+    </View>
+    <View style={styles.attributeContent}>
+      <View style={styles.attributeTextRow}>
+        <Text style={styles.attributeLabel}>{label}</Text>
+        <Text style={styles.attributeValue}>{value}</Text>
+      </View>
+      <View style={styles.barBackgroundAttr}>
+        <View style={[styles.barFillAttr, { width: progress as any }]} />
+      </View>
+    </View>
+  </View>
+);
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
-});
+const NavItem = ({
+  icon,
+  label,
+  active = false,
+}: {
+  icon: string;
+  label: string;
+  active?: boolean;
+}) => (
+  <View style={styles.navItem}>
+    <Text style={[styles.navIcon, active && styles.navActive]}>{icon}</Text>
+    <Text style={[styles.navLabel, active && styles.navActive]}>{label}</Text>
+  </View>
+);
