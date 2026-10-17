@@ -38,7 +38,7 @@ export function BottomNav({ activeTab }: { activeTab: string }) {
       <NavItem name="home" label="Casa" route="/" />
       <NavItem name="check" label="Hábitos" route="/habitos/checkin" />
       <NavItem name="flag" label="Misiones" route="/misiones/tablero" />
-      <NavItem name="shop" label="Tienda" route="/tienda/escaparate" />
+      <NavItem name="shop" label="Tienda" route="/area2_economia/tienda/escaparate" />
       <NavItem name="trophy" label="Progreso" route="/logros/vitrina" />
     </View>
   );
