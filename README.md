@@ -1,56 +1,86 @@
-# Welcome to your Expo app 👋
+# Life-RPG · App Móvil (Frontend)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Cliente móvil desarrollado en **React Native con Expo y TypeScript**. Esta aplicación funciona bajo el patrón arquitectónico **MVVM (Model-View-ViewModel)**.
 
-## Get started
+**Nota importante:** El frontend es estrictamente la capa de Interfaz de Usuario (UI). No contiene reglas de negocio pesadas ni cálculos de experiencia (XP) o daño (HP); todo se obtiene y se guarda mediante peticiones a la API REST del backend en la nube.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## Arquitectura y Flujo de Trabajo (MVVM)
 
-2. Start the app
+El proyecto utiliza un flujo unidireccional para garantizar la separación de responsabilidades:
+**Flujo:** `View (app/)` → `ViewModel (viewmodels/)` → `Service (services/)` → `Backend API`.
 
-   ```bash
-   npx expo start
-   ```
+| Capa          | Carpeta                        | Responsabilidad                                                                                                                                                         |
+| :------------ | :----------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Model**     | `src/models/`                  | Interfaces y Tipos de TypeScript (ej. `Tamagotchi.ts`, `Quest.ts`). Definen la forma de los datos, **no contienen lógica**.                                             |
+| **View**      | `src/app/` y `src/components/` | Pantallas (basadas en Expo Router) y componentes visuales reutilizables. Solo se encargan de pintar la UI e invocar los métodos del ViewModel.                          |
+| **ViewModel** | `src/viewmodels/`              | Custom Hooks de React (ej. `useTamagotchiViewModel.ts`). Contienen la lógica de presentación, manejan los estados locales (carga, error) y piden datos a los servicios. |
+| **Service**   | `src/services/`                | Funciones que hacen las peticiones HTTP (`GET`, `POST`, etc.) a los endpoints del backend en C# (ej. `apiClient.ts`).                                                   |
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Estructura de Carpetas
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Rutas de la Aplicación (Expo Router)
 
-## Get a fresh project
+Las pantallas se organizan físicamente por el área de impacto en la carpeta `src/app/`:
 
-When you're ready, run:
+- `(area1_jugabilidad)/`: Rutas de Tamagotchi, perfil, hábitos y misiones.
+- `(area2_economia)/`: Rutas de tienda, logros y estado de ánimo.
+- _(Las áreas 3 y 4 corresponden al cliente PWA)_.
+
+### Carpetas Compartidas
+
+- **`assets/`**: Recursos estáticos como `images/`, `fonts/` (ej. tipografía RetroTech) y animaciones de la mascota.
+- **`src/components/`**: Componentes visuales genéricos (`ui/` como botones, modales, `BottomNav`) y específicos (`tamagotchi/`, `gamificacion/`).
+- **`src/constants/`**: Archivo `theme.ts` con la paleta de colores global y modo oscuro/claro centralizado.
+- **`src/styles/`**: Archivos de estilos compartidos (ej. `index.styles.ts`).
+- **`src/hooks/`**: Hooks utilitarios genéricos que no son de negocio (ej. `useTheme`).
+
+---
+
+## División de Tareas por Módulos
+
+El desarrollo está segmentado en 15 módulos asignados a 5 desarrolladores a lo largo de 3 Sprints (S1, S2, S3). Cada módulo debe contener estrictamente **3 pantallas o vistas diferentes**.
+
+| Carpeta Asignada             | Módulo                                             | Responsable | Área  |
+| :--------------------------- | :------------------------------------------------- | :---------- | :---- |
+| `m00-usuarios-autenticacion` | Usuarios, autenticación y dispositivo              | Equipo      | Ambas |
+| `m01-tamagotchi-perfil`      | Tamagotchi y perfil de usuario                     | Majo        | Móvil |
+| `m02-habitos`                | Hábitos diarios (quests)                           | Majo        | Móvil |
+| `m03-misiones-enfoque`       | Misiones únicas y enfoque                          | Angel       | Móvil |
+| `m04-tienda`                 | Tienda de la mascota                               | Emi         | Móvil |
+| `m05-logros-progresion`      | Logros y progresión                                | Mike        | Móvil |
+| `m06-vitalidad`              | Vitalidad y estado de la mascota                   | Jandro      | Móvil |
+| `m07-visualizador-usuarios`  | Visualizador de usuarios (Perfil Lite)             | Majo        | PWA   |
+| `m08-botin`                  | Botín (regalos entre amigos / visor de evidencias) | Angel       | PWA   |
+| `m09-diario-aventura`        | Diario de aventura (Dashboard Analítico)           | Angel       | PWA   |
+| `m10-notificaciones`         | Notificaciones de acompañamiento (Alertas)         | Emi         | PWA   |
+| `m11-resumen-progreso`       | Resumen de progreso y daño                         | Emi         | PWA   |
+| `m12-retos-grupo`            | Retos y métricas de grupo (Gremios)                | Jandro      | PWA   |
+| `m13-sincronizacion-red`     | Sincronización local y red                         | Mike        | PWA   |
+| `m14-economia-global`        | Balanceo de economía global                        | Jandro      | PWA   |
+| `m15-gestion-bd`             | Gestión de base de datos                           | Mike        | Ambas |
+
+---
+
+## Configuración y Arranque
+
+Asegúrate de tener instalado Node.js. Utilizaremos `pnpm` como gestor de paquetes para mantener la coherencia con el entorno de trabajo general.
 
 ```bash
-npm run reset-project
+# 1. Instalar pnpm globalmente (si no lo tienes)
+npm install -g pnpm
+
+# 2. Configurar variables de entorno
+cp .env.example .env
+
+# 3. Instalar dependencias del proyecto
+pnpm install
+
+# 4. Iniciar el servidor de desarrollo de Expo (limpiando caché)
+pnpm dlx expo start -c
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Una vez que el servidor esté corriendo, escanea el código QR con la app **Expo Go** en tu celular físico, o presiona `a` para abrir en el emulador de Android / `i` para el simulador de iOS.
