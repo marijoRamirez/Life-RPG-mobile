@@ -1,9 +1,14 @@
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { theme } from "../../constants/theme";
 import { PixelIcon } from "./PixelIcons";
+
+// La barra va al final de la pantalla (no flota sobre el contenido) y suma
+// el alto de la barra de navegación del sistema para no quedar debajo de ella.
 export function BottomNav({ activeTab }: { activeTab: string }) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const NavItem = ({
     name,
@@ -20,6 +25,9 @@ export function BottomNav({ activeTab }: { activeTab: string }) {
       <TouchableOpacity
         style={styles.navItem}
         onPress={() => router.push(route as any)}
+        accessibilityRole="tab"
+        accessibilityState={{ selected: isActive }}
+        accessibilityLabel={label}
       >
         <PixelIcon
           name={name}
@@ -34,10 +42,13 @@ export function BottomNav({ activeTab }: { activeTab: string }) {
   };
 
   return (
-    <View style={styles.bottomNav}>
+    <View
+      style={[styles.bottomNav, { paddingBottom: Math.max(insets.bottom, 8) }]}
+      accessibilityRole="tablist"
+    >
       <NavItem name="home" label="Casa" route="/" />
       <NavItem name="check" label="Hábitos" route="/habitos/checkin" />
-      <NavItem name="flag" label="Misiones" route="/misiones/tablero" />
+      <NavItem name="flag" label="Misiones" route="/area1_jugabilidad/misiones/tablero" />
       <NavItem name="shop" label="Tienda" route="/area2_economia/tienda/escaparate" />
       <NavItem name="trophy" label="Progreso" route="/logros/vitrina" />
     </View>
@@ -46,23 +57,25 @@ export function BottomNav({ activeTab }: { activeTab: string }) {
 
 const styles = StyleSheet.create({
   bottomNav: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 70,
     backgroundColor: theme.colors.surface,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
+    paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: theme.colors.surfaceAlt,
   },
-  navItem: { alignItems: "center" },
+  navItem: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+    minWidth: 56,
+    minHeight: 48,
+    paddingVertical: 4,
+  },
   navLabel: {
     fontSize: 12,
     color: theme.colors.textSecondary,
-    marginTop: 2,
     fontFamily: theme.fonts.retro,
   },
   navActive: { color: theme.colors.yellow },
