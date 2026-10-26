@@ -1,11 +1,13 @@
-import { PixelIcon } from "@/components/ui/PixelIcons";
+import { AddIcon, ChevronLeftIcon, MinusIcon, PixelIcon } from "@/components/ui/PixelIcons";
 import {
+COLORS,
 ICON_OPTIONS,
 POINT_META,
 POINT_TYPES,
 PointType,
+SUGGESTED_PRICE,
 } from "@/app/area2_economia/tienda/data/tienda";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import {
 Alert,
@@ -13,6 +15,7 @@ KeyboardAvoidingView,
 Platform,
 SafeAreaView,
 ScrollView,
+Switch,
 Text,
 TextInput,
 TouchableOpacity,
@@ -24,11 +27,14 @@ const PRICE_STEP = 10;
 
 export default function DetalleCompraScreen() {
 const router = useRouter();
-const [name, setName] = useState("");
-const [description, setDescription] = useState("");
+const [icon, setIcon] = useState(ICON_OPTIONS[0]);
+const [name, setName] = useState("Noche de cine con amigos");
+const [description, setDescription] = useState(
+    "Película en el cine del centro, con palomitas grandes.",
+);
 const [pointType, setPointType] = useState<PointType>("cultura");
-const [price, setPrice] = useState(100);
-const [emoji, setEmoji] = useState(ICON_OPTIONS[0]);
+const [price, setPrice] = useState(300);
+const [consumable, setConsumable] = useState(true);
 
 const meta = POINT_META[pointType];
 const canSave = name.trim().length > 0 && price > 0;
@@ -39,7 +45,7 @@ const handlePriceText = (text: string) => {
 };
 
 const handleSave = () => {
-    // TODO: enviar { name, description, pointType, price, emoji } a la API
+    // TODO: enviar { icon, name, description, pointType, price, consumable } a la API
     Alert.alert("Recompensa creada", `"${name.trim()}" ya está en tu escaparate.`, [
     { text: "Listo", onPress: () => router.back() },
     ]);
@@ -47,6 +53,7 @@ const handleSave = () => {
 
 return (
     <SafeAreaView style={styles.container}>
+    <Stack.Screen options={{ headerShown: false }} />
     <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -55,142 +62,148 @@ return (
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         >
+        {/* Header */}
         <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backText}>{"<"}</Text>
+            <ChevronLeftIcon size={16} color={COLORS.text} />
             </TouchableOpacity>
-            <Text style={styles.title}>Nueva recompensa</Text>
+            <Text style={styles.title}>Recompensa personalizada</Text>
         </View>
 
-        {/* Vista previa en vivo */}
-        <View style={[styles.previewCard, { borderColor: meta.color }]}>
-            <View style={styles.previewEmojiBox}>
-            <Text style={styles.previewEmoji}>{emoji}</Text>
+        {/* Vista previa */}
+        <View style={styles.previewCard}>
+            <View style={styles.previewIconBox}>
+            <PixelIcon name={icon} size={32} color={COLORS.ink} />
             </View>
             <View style={styles.previewInfo}>
             <Text style={styles.previewName} numberOfLines={1}>
                 {name.trim() || "Nombre de la recompensa"}
             </Text>
-            <Text style={styles.previewDesc} numberOfLines={2}>
-                {description.trim() || "Agrega una descripción para recordar qué ganas."}
+            <Text style={styles.previewSub}>
+                {consumable ? "Consumible · se usa una vez" : "Permanente · se queda contigo"}
             </Text>
-            <View style={styles.previewPriceRow}>
-                <PixelIcon name={meta.icon as any} size={18} color={meta.color} />
-                <Text style={[styles.previewPrice, { color: meta.color }]}>{price}</Text>
             </View>
+            <View style={styles.previewPrice}>
+            <PixelIcon name={meta.icon} size={16} color={COLORS.amber} />
+            <Text style={styles.previewPriceText}>{price}</Text>
             </View>
         </View>
 
+        {/* Ícono */}
+        <Text style={styles.sectionLabel}>ÍCONO</Text>
+        <View style={styles.iconRow}>
+            {ICON_OPTIONS.map((i) => (
+            <TouchableOpacity
+                key={i}
+                style={[styles.iconOption, icon === i && styles.iconOptionActive]}
+                onPress={() => setIcon(i)}
+            >
+                <PixelIcon name={i} size={16} color={COLORS.text} />
+            </TouchableOpacity>
+            ))}
+        </View>
+
         {/* Nombre */}
-        <View style={styles.section}>
-            <Text style={styles.label}>Nombre</Text>
-            <TextInput
+        <Text style={styles.sectionLabel}>NOMBRE</Text>
+        <TextInput
             style={styles.input}
             value={name}
             onChangeText={setName}
             placeholder="Ej. Maratón de series"
-            placeholderTextColor="#6B6B7D"
+            placeholderTextColor={COLORS.muted}
             maxLength={30}
-            />
-        </View>
+        />
 
-        {/* Descripción */}
-        <View style={styles.section}>
-            <Text style={styles.label}>Detalles</Text>
-            <TextInput
+        {/* Detalles */}
+        <Text style={styles.sectionLabel}>DETALLES</Text>
+        <TextInput
             style={[styles.input, styles.inputMultiline]}
             value={description}
             onChangeText={setDescription}
             placeholder="¿Qué incluye o cuándo puedes usarla?"
-            placeholderTextColor="#6B6B7D"
+            placeholderTextColor={COLORS.muted}
             multiline
             maxLength={80}
-            />
-        </View>
+        />
 
-        {/* Tipo de puntos */}
-        <View style={styles.section}>
-            <Text style={styles.label}>Se paga con</Text>
-            <View style={styles.typeRow}>
+        {/* Se paga con */}
+        <Text style={styles.sectionLabel}>SE PAGA CON</Text>
+        <View style={styles.typeRow}>
             {POINT_TYPES.map((type) => {
-                const m = POINT_META[type];
-                const active = pointType === type;
-                return (
+            const active = pointType === type;
+            return (
                 <TouchableOpacity
-                    key={type}
-                    style={[
-                    styles.typeOption,
-                    active && { borderColor: m.color, backgroundColor: "#2A2A35" },
-                    ]}
-                    onPress={() => setPointType(type)}
+                key={type}
+                style={[styles.typeOption, active && styles.typeOptionActive]}
+                onPress={() => setPointType(type)}
                 >
-                    <PixelIcon
-                    name={m.icon as any}
-                    size={22}
-                    color={active ? m.color : "#9A9AAE"}
-                    />
-                    <Text style={[styles.typeText, active && { color: m.color }]}>
-                    {m.label}
-                    </Text>
+                <PixelIcon
+                    name={POINT_META[type].icon}
+                    size={16}
+                    color={active ? COLORS.ink : COLORS.text}
+                />
+                <Text style={[styles.typeText, active && styles.typeTextActive]}>
+                    {POINT_META[type].label}
+                </Text>
                 </TouchableOpacity>
-                );
+            );
             })}
-            </View>
         </View>
 
         {/* Precio */}
-        <View style={styles.section}>
-            <Text style={styles.label}>Precio</Text>
-            <View style={styles.priceControl}>
+        <Text style={styles.sectionLabel}>PRECIO</Text>
+        <View style={styles.priceControl}>
             <TouchableOpacity
-                style={styles.stepButton}
-                onPress={() => setPrice((p) => Math.max(0, p - PRICE_STEP))}
+            style={styles.stepButton}
+            onPress={() => setPrice((p) => Math.max(0, p - PRICE_STEP))}
             >
-                <Text style={styles.stepText}>-</Text>
+            <MinusIcon size={16} color={COLORS.text} />
             </TouchableOpacity>
+            <View style={styles.priceBox}>
             <TextInput
-                style={[styles.input, styles.priceInput]}
+                style={styles.priceInput}
                 value={String(price)}
                 onChangeText={handlePriceText}
                 keyboardType="number-pad"
                 maxLength={5}
             />
+            </View>
             <TouchableOpacity
-                style={styles.stepButton}
-                onPress={() => setPrice((p) => p + PRICE_STEP)}
+            style={styles.stepButton}
+            onPress={() => setPrice((p) => p + PRICE_STEP)}
             >
-                <Text style={styles.stepText}>+</Text>
+            <AddIcon size={16} color={COLORS.text} />
             </TouchableOpacity>
-            </View>
-            <Text style={styles.hint}>Puntos de {meta.label}</Text>
         </View>
+        <Text style={styles.hint}>
+            Sugerido para tu nivel (LV {SUGGESTED_PRICE.level}): {SUGGESTED_PRICE.min} a{" "}
+            {SUGGESTED_PRICE.max} pts
+        </Text>
 
-        {/* Ícono */}
-        <View style={styles.section}>
-            <Text style={styles.label}>Ícono</Text>
-            <View style={styles.emojiRow}>
-            {ICON_OPTIONS.map((e) => (
-                <TouchableOpacity
-                key={e}
-                style={[styles.emojiOption, emoji === e && styles.emojiOptionActive]}
-                onPress={() => setEmoji(e)}
-                >
-                <Text style={styles.emojiOptionText}>{e}</Text>
-                </TouchableOpacity>
-            ))}
+        {/* Consumible */}
+        <View style={styles.switchRow}>
+            <View style={{ flex: 1 }}>
+            <Text style={styles.switchTitle}>Consumible</Text>
+            <Text style={styles.switchSub}>Desaparece del inventario al canjearla</Text>
             </View>
+            <Switch
+            value={consumable}
+            onValueChange={setConsumable}
+            trackColor={{ false: COLORS.surfaceAlt, true: COLORS.green }}
+            thumbColor={COLORS.ink}
+            />
         </View>
+        </ScrollView>
 
+        <View style={styles.footer}>
         <TouchableOpacity
             style={[styles.saveButton, !canSave && styles.saveButtonDisabled]}
             disabled={!canSave}
             onPress={handleSave}
         >
-            <Text style={[styles.saveText, !canSave && styles.saveTextDisabled]}>
-            Guardar recompensa
-            </Text>
+            <Text style={styles.saveText}>Guardar</Text>
         </TouchableOpacity>
-        </ScrollView>
+        </View>
     </KeyboardAvoidingView>
     </SafeAreaView>
 );
