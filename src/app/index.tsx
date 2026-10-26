@@ -1,7 +1,9 @@
 import {
   Image,
+  Platform,
   SafeAreaView,
   ScrollView,
+  StatusBar,
   Text,
   TouchableOpacity,
   View,
@@ -21,7 +23,12 @@ import { styles } from "./styles/index.styles";
 
 export default function HUDPrincipalScreen() {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        { paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0 },
+      ]}
+    >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <View style={styles.headerProfile}>
