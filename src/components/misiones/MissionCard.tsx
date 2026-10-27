@@ -4,7 +4,7 @@ import { PixelIcon } from "@/components/ui/PixelIcons";
 import { MISSION_COLORS, MISSION_TYPE_META } from "@/constants/missionTypes";
 import { theme } from "@/constants/theme";
 import type { Mission } from "@/models/Mission";
-import { shared } from "@/app/styles/misiones.styles";
+import { shared } from "@/app/styles/missions.styles";
 
 type Props = { mission: Mission; onStart: (mission: Mission) => void };
 
