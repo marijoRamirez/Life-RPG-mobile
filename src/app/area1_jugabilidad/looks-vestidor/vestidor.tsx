@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { PixelIcon } from "@/components/ui/PixelIcons";
 import { theme } from "@/constants/theme";
-import { styles } from "../../styles/vestidor.styles";
+import { wardrobeStyles as styles } from "../../styles/looks.styles";
 
 type Category = "Cabeza" | "Cara" | "Cuerpo" | "Fondo";
 const CATEGORIES: Category[] = ["Cabeza", "Cara", "Cuerpo", "Fondo"];

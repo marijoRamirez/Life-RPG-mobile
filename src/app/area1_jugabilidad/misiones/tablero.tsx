@@ -10,8 +10,7 @@ import { PixelIcon } from "@/components/ui/PixelIcons";
 import { MISSION_TYPE_META, MISSION_TYPES } from "@/constants/missionTypes";
 import { theme } from "@/constants/theme";
 import type { Mission } from "@/models/Mission";
-import { shared } from "../../styles/misiones.styles";
-import { styles } from "../../styles/tablero.styles";
+import { boardStyles as styles, shared } from "../../styles/missions.styles";
 import { type MissionFilter, useMissionBoardViewModel } from "@/viewmodels/useMissionBoardViewModel";
 
 const FILTERS: PillOption<MissionFilter>[] = [

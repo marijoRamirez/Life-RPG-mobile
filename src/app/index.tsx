@@ -19,7 +19,7 @@ import {
 import { useRouter } from "expo-router";
 
 import { BottomNav } from "@/components/ui/BottomNav";
-import { styles } from "./styles/index.styles";
+import { homeStyles as styles } from "./styles/home.styles";
 
 export default function HUDPrincipalScreen() {
   const router = useRouter(); //el coso para las rutas
@@ -135,9 +135,10 @@ export default function HUDPrincipalScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: "#2A2A35" }]}
+            onPress={() => router.push("/area1_jugabilidad/misiones/tablero")}
           >
             <Text style={[styles.actionButtonText, { color: "#FFF" }]}>
-              <FocusIcon size={16} color="#FFFFFF" /> Enfocar
+              <FocusIcon size={16} color="#FFFFFF" /> Misiones
             </Text>
           </TouchableOpacity>
           <TouchableOpacity

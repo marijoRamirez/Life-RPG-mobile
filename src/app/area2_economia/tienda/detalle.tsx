@@ -18,7 +18,7 @@ TextInput,
 TouchableOpacity,
 View,
 } from "react-native";
-import { styles } from "../../styles/detalle.styles";
+import { itemDetailStyles as styles } from "../../styles/shop.styles";
 
 const PRICE_STEP = 10;
 

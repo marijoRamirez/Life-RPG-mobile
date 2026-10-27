@@ -18,7 +18,7 @@ Text,
 TouchableOpacity,
 View,
 } from "react-native";
-import { styles } from "../../styles/inventario.styles";
+import { inventoryStyles as styles } from "../../styles/shop.styles";
 
 const ACTION_LABEL: Record<InventoryKind, string> = {
 recompensa: "Canjear",

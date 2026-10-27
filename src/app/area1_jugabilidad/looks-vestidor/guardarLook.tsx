@@ -1,18 +1,18 @@
 import { router, Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    Image,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ClothesIcon, PixelIcon } from "@/components/ui/PixelIcons";
 import { theme } from "@/constants/theme";
-import { styles } from "../../styles/guardar-look.styles";
+import { saveLookStyles as styles } from "../../styles/looks.styles";
 
 export default function GuardarLook() {
   const route = useRouter();
