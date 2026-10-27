@@ -142,7 +142,9 @@ export default function HUDPrincipalScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: "#9C27B0" }]}
-            onPress={() => router.push("/area1_jugabilidad/vestidor")}
+            onPress={() =>
+              router.push("/area1_jugabilidad/looks-vestidor/vestidor")
+            }
           >
             <Text style={[styles.actionButtonText, { color: "#FFF" }]}>
               <ClothesIcon size={16} color="#FFFFFF" /> Vestidor

@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { PixelIcon } from "@/components/ui/PixelIcons";
 import { theme } from "@/constants/theme";
-import { styles } from "../styles/vestidor.styles";
+import { styles } from "../../styles/vestidor.styles";
 
 type Category = "Cabeza" | "Cara" | "Cuerpo" | "Fondo";
 const CATEGORIES: Category[] = ["Cabeza", "Cara", "Cuerpo", "Fondo"];
@@ -143,7 +143,7 @@ export default function VestidorScreen() {
           <Text style={styles.lookSubtitle}>Look Actual</Text>
           <Text style={styles.lookTitle}>Lector nocturno</Text>
           <Image
-            source={require("../../../assets/images/gato.png")}
+            source={require("../../../../assets/images/gato.png")}
             style={styles.mascotaImage}
             resizeMode="contain"
           />
@@ -231,7 +231,12 @@ export default function VestidorScreen() {
           )}
         </View>
 
-        <TouchableOpacity style={styles.saveButton}>
+        <TouchableOpacity
+          style={styles.saveButton}
+          onPress={() =>
+            router.push("/area1_jugabilidad/looks-vestidor/guardarLook")
+          }
+        >
           <Text style={styles.saveButtonText}>Guardar look</Text>
         </TouchableOpacity>
       </ScrollView>
