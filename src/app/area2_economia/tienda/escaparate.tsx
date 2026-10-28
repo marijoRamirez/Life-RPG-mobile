@@ -20,7 +20,7 @@ Text,
 TouchableOpacity,
 View,
 } from "react-native";
-import { styles } from "../../styles/escaparate.styles";
+import { showcaseStyles as styles } from "../../styles/shop.styles";
 
 export default function EscaparateScreen() {
 const router = useRouter();

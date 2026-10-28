@@ -1,7 +1,8 @@
 import { StyleSheet } from "react-native";
-import { theme } from "./../../constants/theme";
+import { theme } from "@/constants/theme";
 
-export const styles = StyleSheet.create({
+// Estilos de la pantalla principal (hogar / tamagotchi).
+export const homeStyles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   scrollContent: { padding: 20, paddingBottom: 100 },
 

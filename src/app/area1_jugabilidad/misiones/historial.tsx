@@ -8,8 +8,7 @@ import { BottomNav } from "@/components/ui/BottomNav";
 import { PixelIcon } from "@/components/ui/PixelIcons";
 import { MISSION_COLORS, MISSION_TYPE_META, MISSION_TYPES } from "@/constants/missionTypes";
 import { theme } from "@/constants/theme";
-import { styles } from "../../styles/historial.styles";
-import { shared } from "../../styles/misiones.styles";
+import { historyStyles as styles, shared } from "../../styles/missions.styles";
 import {
   type HistoryStatusFilter,
   type HistoryTypeFilter,

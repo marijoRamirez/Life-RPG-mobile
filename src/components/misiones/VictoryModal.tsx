@@ -5,7 +5,7 @@ import { PixelIcon } from "@/components/ui/PixelIcons";
 import { MISSION_COLORS, MISSION_TYPE_META } from "@/constants/missionTypes";
 import { theme } from "@/constants/theme";
 import type { SessionOutcome } from "@/models/Mission";
-import { shared } from "@/app/styles/misiones.styles";
+import { shared } from "@/app/styles/missions.styles";
 
 type Props = {
   outcome: SessionOutcome | undefined;

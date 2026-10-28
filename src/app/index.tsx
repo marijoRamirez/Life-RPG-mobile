@@ -16,12 +16,13 @@ import {
   MoonIcon,
   PixelIcon,
 } from "@/components/ui/PixelIcons";
+import { useRouter } from "expo-router";
 
-// Importamos los estilos separados
 import { BottomNav } from "@/components/ui/BottomNav";
-import { styles } from "./styles/index.styles";
+import { homeStyles as styles } from "./styles/home.styles";
 
 export default function HUDPrincipalScreen() {
+  const router = useRouter(); //el coso para las rutas
   return (
     <SafeAreaView
       style={[
@@ -134,13 +135,17 @@ export default function HUDPrincipalScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: "#2A2A35" }]}
+            onPress={() => router.push("/area1_jugabilidad/misiones/tablero")}
           >
             <Text style={[styles.actionButtonText, { color: "#FFF" }]}>
-              <FocusIcon size={16} color="#FFFFFF" /> Enfocar
+              <FocusIcon size={16} color="#FFFFFF" /> Misiones
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: "#9C27B0" }]}
+            onPress={() =>
+              router.push("/area1_jugabilidad/looks-vestidor/vestidor")
+            }
           >
             <Text style={[styles.actionButtonText, { color: "#FFF" }]}>
               <ClothesIcon size={16} color="#FFFFFF" /> Vestidor

@@ -20,7 +20,7 @@ import {
 } from "@/constants/missionTypes";
 import { theme } from "@/constants/theme";
 import type { MissionReward, MissionType, NewMissionInput } from "@/models/Mission";
-import { shared } from "@/app/styles/misiones.styles";
+import { shared } from "@/app/styles/missions.styles";
 
 type Props = {
   visible: boolean;
