@@ -1,16 +1,16 @@
 import { BottomNav } from "@/components/ui/BottomNav";
 import { AddIcon, PixelIcon } from "@/components/ui/PixelIcons";
-import { TiendaTabs } from "@/components/tienda/TiendaTabs";
 import {
-CATEGORIES,
-Category,
+COLORS,
+FILTERS,
 POINT_META,
 POINT_TYPES,
+PointType,
 SHOP_ITEMS_MOCK,
 ShopItem,
 WALLET_MOCK,
 } from "@/app/area2_economia/tienda/data/tienda";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
 Alert,
@@ -24,31 +24,38 @@ import { showcaseStyles as styles } from "../../styles/shop.styles";
 
 export default function EscaparateScreen() {
 const router = useRouter();
-const [category, setCategory] = useState<Category | "todo">("todo");
+const [filter, setFilter] = useState<"todo" | PointType>("todo");
 const [wallet, setWallet] = useState(WALLET_MOCK);
 
 const items = useMemo(
     () =>
-    category === "todo"
+    filter === "todo"
         ? SHOP_ITEMS_MOCK
-        : SHOP_ITEMS_MOCK.filter((i) => i.category === category),
-    [category],
+        : SHOP_ITEMS_MOCK.filter((i) => i.pointType === filter),
+    [filter],
 );
 
-const handleBuy = (item: ShopItem) => {
+const handlePress = (item: ShopItem) => {
     const meta = POINT_META[item.pointType];
+    const missing = item.price - wallet[item.pointType];
+
+    if (missing > 0) {
+    Alert.alert(
+        "Puntos insuficientes",
+        `Te faltan ${missing} pts de ${meta.label} para "${item.name}".`,
+    );
+    return;
+    }
+
     Alert.alert(
     "Confirmar compra",
-    `¿Comprar "${item.name}" por ${item.price} Puntos de ${meta.label}?`,
+    `¿Comprar "${item.name}" por ${item.price} pts de ${meta.label}?`,
     [
         { text: "Cancelar", style: "cancel" },
         {
         text: "Comprar",
         onPress: () =>
-            setWallet((w) => ({
-            ...w,
-            [item.pointType]: w[item.pointType] - item.price,
-            })),
+            setWallet((w) => ({ ...w, [item.pointType]: w[item.pointType] - item.price })),
         },
     ],
     );
@@ -56,49 +63,46 @@ const handleBuy = (item: ShopItem) => {
 
 return (
     <SafeAreaView style={styles.container}>
+    <Stack.Screen options={{ headerShown: false }} />
     <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View>
-        <Text style={styles.title}>Tienda de Susi</Text>
-        <Text style={styles.subtitle}>Gasta tus puntos en recompensas</Text>
-        </View>
-
-        <TiendaTabs active="escaparate" />
-
-        {/* Puntos disponibles */}
-        <View style={styles.walletRow}>
-        {POINT_TYPES.map((type) => {
-            const meta = POINT_META[type];
-            return (
-            <View key={type} style={[styles.walletChip, { borderColor: meta.color }]}>
-                <PixelIcon name={meta.icon} size={16} color={meta.color} />
-                <Text style={styles.walletValue}>{wallet[type]}</Text>
-                <Text style={styles.walletLabel}>{meta.label}</Text>
-            </View>
-            );
-        })}
-        </View>
-
-        {/* Categorías */}
-        <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filterRow}
+        {/* Header */}
+        <View style={styles.header}>
+        <Text style={styles.title}>Tienda</Text>
+        <TouchableOpacity
+            style={styles.gridButton}
+            onPress={() => router.push("/area2_economia/tienda/inventario")}
         >
-        {CATEGORIES.map((c) => {
-            const active = category === c.key;
+            <PixelIcon name="bag" size={16} color={COLORS.text} />
+        </TouchableOpacity>
+        </View>
+
+        {/* Puntos */}
+        <View style={styles.walletRow}>
+        {POINT_TYPES.map((type) => (
+            <View key={type} style={styles.walletChip}>
+            <PixelIcon name={POINT_META[type].icon} size={16} color={COLORS.amber} />
+            <Text style={styles.walletValue}>{wallet[type]}</Text>
+            </View>
+        ))}
+        </View>
+
+        {/* Filtros */}
+        <View style={styles.segment}>
+        {FILTERS.map((f) => {
+            const active = filter === f.key;
             return (
             <TouchableOpacity
-                key={c.key}
-                style={[styles.filterPill, active && styles.filterPillActive]}
-                onPress={() => setCategory(c.key)}
+                key={f.key}
+                style={[styles.segmentItem, active && styles.segmentItemActive]}
+                onPress={() => setFilter(f.key)}
             >
-                <Text style={[styles.filterText, active && styles.filterTextActive]}>
-                {c.label}
+                <Text style={[styles.segmentText, active && styles.segmentTextActive]}>
+                {f.label}
                 </Text>
             </TouchableOpacity>
             );
         })}
-        </ScrollView>
+        </View>
 
         {/* Artículos */}
         <View style={styles.grid}>
@@ -107,48 +111,47 @@ return (
         )}
         {items.map((item) => {
             const meta = POINT_META[item.pointType];
-            const missing = item.price - wallet[item.pointType];
-            const canBuy = missing <= 0;
+            const locked = item.price > wallet[item.pointType];
             return (
-            <View key={item.id} style={styles.card}>
-                <View style={styles.emojiBox}>
-                <PixelIcon name={item.icon} size={48} color={meta.color} />
+            <TouchableOpacity
+                key={item.id}
+                activeOpacity={0.8}
+                style={[styles.card, locked && styles.cardLocked]}
+                onPress={() => handlePress(item)}
+            >
+                <View style={styles.iconBox}>
+                <PixelIcon name={item.icon} size={32} color={COLORS.text} />
+                {item.isCustom && (
+                    <View style={styles.badge}>
+                    <Text style={styles.badgeText}>TUYA</Text>
+                    </View>
+                )}
                 </View>
                 <Text style={styles.itemName} numberOfLines={1}>
                 {item.name}
                 </Text>
-                <Text style={styles.itemDesc} numberOfLines={2}>
-                {item.description}
-                </Text>
                 <View style={styles.priceRow}>
-                <PixelIcon name={meta.icon} size={16} color={meta.color} />
-                <Text style={[styles.priceText, { color: meta.color }]}>
-                    {item.price}
-                </Text>
+                <PixelIcon name={meta.icon} size={16} color={COLORS.amber} />
+                <Text style={styles.priceText}>{item.price}</Text>
+                <Text style={styles.priceType}>{meta.label}</Text>
                 </View>
-                <TouchableOpacity
-                style={[styles.buyButton, !canBuy && styles.buyButtonDisabled]}
-                disabled={!canBuy}
-                onPress={() => handleBuy(item)}
-                >
-                <Text style={[styles.buyText, !canBuy && styles.buyTextDisabled]}>
-                    {canBuy ? "Comprar" : `Faltan ${missing}`}
-                </Text>
-                </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
             );
         })}
         </View>
+    </ScrollView>
 
+    <View style={styles.footer}>
         <TouchableOpacity
         style={styles.createButton}
         onPress={() => router.push("/area2_economia/tienda/detalle")}
         >
-        <AddIcon size={16} color="#FFFFFF" />
+        <AddIcon size={16} color={COLORS.text} />
         <Text style={styles.createText}>Crear recompensa</Text>
         </TouchableOpacity>
-    </ScrollView>
-    <BottomNav activeTab={"tienda" as any} />
+    </View>
+
+    <BottomNav activeTab="shop" />
     </SafeAreaView>
 );
 }

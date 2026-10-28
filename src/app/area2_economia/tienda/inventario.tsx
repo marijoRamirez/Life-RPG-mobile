@@ -1,14 +1,14 @@
 import { BottomNav } from "@/components/ui/BottomNav";
-import { PixelIcon } from "@/components/ui/PixelIcons";
-import { TiendaTabs } from "@/components/tienda/TiendaTabs";
+import { ClothesIcon, PixelIcon } from "@/components/ui/PixelIcons";
 import {
-INVENTORY_MOCK,
-INVENTORY_TABS,
-InventoryItem,
-InventoryKind,
-POINT_META,
+CLOTHING_MOCK,
+COLORS,
+CONSUMABLES_MOCK,
+Consumable,
+OWNED_REWARDS_MOCK,
+OwnedReward,
 } from "@/app/area2_economia/tienda/data/tienda";
-import { useRouter } from "expo-router";
+import { Stack } from "expo-router";
 import { useState } from "react";
 import {
 Alert,
@@ -20,126 +20,126 @@ View,
 } from "react-native";
 import { inventoryStyles as styles } from "../../styles/shop.styles";
 
-const ACTION_LABEL: Record<InventoryKind, string> = {
-recompensa: "Canjear",
-consumible: "Usar",
-ropa: "Equipar",
-};
-
 export default function InventarioScreen() {
-const router = useRouter();
-const [tab, setTab] = useState<InventoryKind>("recompensa");
-const [items, setItems] = useState<InventoryItem[]>(INVENTORY_MOCK);
+const [rewards, setRewards] = useState(OWNED_REWARDS_MOCK);
+const [consumables, setConsumables] = useState(CONSUMABLES_MOCK);
+const [clothing, setClothing] = useState(CLOTHING_MOCK);
 
-const visible = items.filter((i) => i.kind === tab);
+const totalObjects =
+    rewards.length +
+    consumables.reduce((sum, c) => sum + c.quantity, 0) +
+    clothing.length;
 
-const consume = (item: InventoryItem) => {
-    // Resta 1 y elimina el objeto cuando se acaba
-    setItems((prev) =>
-    prev
-        .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
-        .filter((i) => i.quantity > 0),
-    );
-};
-
-const handleAction = (item: InventoryItem) => {
-    if (item.kind === "ropa") {
-    setItems((prev) =>
-        prev.map((i) => (i.id === item.id ? { ...i, equipped: !i.equipped } : i)),
-    );
-    return;
-    }
-    const verb = item.kind === "recompensa" ? "canjear" : "usar";
-    Alert.alert("Confirmar", `¿Quieres ${verb} "${item.name}"?`, [
+const handleRedeem = (reward: OwnedReward) => {
+    Alert.alert("Canjear recompensa", `¿Canjear "${reward.name}" ahora?`, [
     { text: "Cancelar", style: "cancel" },
-    { text: "Sí", onPress: () => consume(item) },
+    {
+        text: "Canjear",
+        onPress: () => setRewards((prev) => prev.filter((r) => r.id !== reward.id)),
+    },
     ]);
 };
 
+const handleUse = (item: Consumable) => {
+    Alert.alert("Usar consumible", `¿Usar "${item.name}"?`, [
+    { text: "Cancelar", style: "cancel" },
+    {
+        text: "Usar",
+        onPress: () =>
+        setConsumables((prev) =>
+            prev
+            .map((c) => (c.id === item.id ? { ...c, quantity: c.quantity - 1 } : c))
+            .filter((c) => c.quantity > 0),
+        ),
+    },
+    ]);
+};
+
+const toggleClothing = (id: string) =>
+    setClothing((prev) => prev.map((c) => (c.id === id ? { ...c, equipped: !c.equipped } : c)));
+
 return (
     <SafeAreaView style={styles.container}>
+    <Stack.Screen options={{ headerShown: false }} />
     <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View>
+        {/* Header */}
+        <View style={styles.header}>
         <Text style={styles.title}>Inventario</Text>
-        <Text style={styles.subtitle}>Lo que ya tienes</Text>
+        <Text style={styles.count}>{totalObjects} objetos</Text>
         </View>
 
-        <TiendaTabs active="inventario" />
-
-        <View style={styles.filterRow}>
-        {INVENTORY_TABS.map((t) => {
-            const active = tab === t.key;
-            return (
-            <TouchableOpacity
-                key={t.key}
-                style={[styles.filterPill, active && styles.filterPillActive]}
-                onPress={() => setTab(t.key)}
-            >
-                <Text style={[styles.filterText, active && styles.filterTextActive]}>
-                {t.label}
-                </Text>
-            </TouchableOpacity>
-            );
-        })}
-        </View>
-
-        <View style={styles.grid}>
-        {visible.length === 0 && (
-            <View style={styles.emptyBox}>
-            <Text style={styles.emptyText}>Aquí no hay nada todavía.</Text>
-            <TouchableOpacity
-                style={styles.emptyButton}
-                onPress={() => router.replace("/area2_economia/tienda/escaparate")}
-            >
-                <Text style={styles.emptyButtonText}>Ir al escaparate</Text>
-            </TouchableOpacity>
+        {/* Recompensas activas */}
+        <Text style={styles.sectionLabel}>RECOMPENSAS ACTIVAS</Text>
+        {rewards.length === 0 && (
+        <Text style={styles.emptyText}>No tienes recompensas pendientes.</Text>
+        )}
+        {rewards.map((r) => (
+        <View key={r.id} style={styles.rewardCard}>
+            <View style={styles.rewardIconBox}>
+            <PixelIcon name={r.icon} size={16} color={COLORS.text} />
             </View>
+            <View style={styles.rewardInfo}>
+            <Text style={styles.rewardName}>{r.name}</Text>
+            <Text style={styles.rewardSub}>{r.subtitle}</Text>
+            </View>
+            <TouchableOpacity style={styles.redeemButton} onPress={() => handleRedeem(r)}>
+            <Text style={styles.redeemText}>Canjear</Text>
+            </TouchableOpacity>
+        </View>
+        ))}
+
+        {/* Consumibles */}
+        <Text style={styles.sectionLabel}>CONSUMIBLES</Text>
+        {consumables.length === 0 ? (
+        <Text style={styles.emptyText}>No tienes consumibles.</Text>
+        ) : (
+        <View style={styles.consumableRow}>
+            {consumables.map((c) => (
+            <TouchableOpacity
+                key={c.id}
+                style={styles.consumableCard}
+                activeOpacity={0.8}
+                onPress={() => handleUse(c)}
+            >
+                <Text style={styles.qty}>x{c.quantity}</Text>
+                <PixelIcon name={c.icon} size={32} color={COLORS.text} />
+                <Text style={styles.consumableName}>{c.name}</Text>
+                <Text style={styles.consumableUse}>Usar</Text>
+            </TouchableOpacity>
+            ))}
+        </View>
         )}
 
-        {visible.map((item) => {
-            const meta = item.pointType ? POINT_META[item.pointType] : null;
-            const equipped = item.kind === "ropa" && item.equipped;
-            return (
-            <View key={item.id} style={[styles.card, equipped && styles.cardEquipped]}>
-                <View style={styles.emojiBox}>
-                <PixelIcon
-                    name={item.icon}
-                    size={48}
-                    color={meta ? meta.color : "#FFFFFF"}
-                />
-                {item.kind !== "ropa" && (
-                    <View style={styles.qtyBadge}>
-                    <Text style={styles.qtyText}>x{item.quantity}</Text>
-                    </View>
-                )}
-                </View>
-                <Text style={styles.itemName} numberOfLines={1}>
-                {item.name}
-                </Text>
-                <View style={styles.tagRow}>
-                {meta && (
-                    <>
-                    <PixelIcon name={meta.icon} size={16} color={meta.color} />
-                    <Text style={[styles.tagText, { color: meta.color }]}>
-                        {meta.label}
-                    </Text>
-                    </>
-                )}
-                </View>
-                <TouchableOpacity
-                style={[styles.actionButton, equipped && styles.actionButtonEquipped]}
-                onPress={() => handleAction(item)}
-                >
-                <Text style={styles.actionText}>
-                    {equipped ? "Quitar" : ACTION_LABEL[item.kind]}
-                </Text>
-                </TouchableOpacity>
-            </View>
-            );
-        })}
+        {/* Ropa */}
+        <Text style={styles.sectionLabel}>ROPA DEL TAMAGOTCHI</Text>
+        <View style={styles.clothingRow}>
+        {clothing.map((c) => (
+            <TouchableOpacity
+            key={c.id}
+            style={[styles.clothingTile, c.equipped && styles.clothingTileActive]}
+            activeOpacity={0.8}
+            onPress={() => toggleClothing(c.id)}
+            >
+            <PixelIcon name={c.icon} size={32} color={COLORS.text} />
+            <Text style={styles.clothingName}>{c.name}</Text>
+            </TouchableOpacity>
+        ))}
         </View>
     </ScrollView>
-    <BottomNav activeTab={"tienda" as any} />
+
+    <View style={styles.footer}>
+        <TouchableOpacity
+        style={styles.wardrobeButton}
+        onPress={() => {
+            // TODO: navegar al vestidor cuando exista la pantalla
+        }}
+        >
+        <ClothesIcon size={16} color={COLORS.text} />
+        <Text style={styles.wardrobeText}>Abrir vestidor</Text>
+        </TouchableOpacity>
+    </View>
+
+    <BottomNav activeTab="shop" />
     </SafeAreaView>
 );
 }
