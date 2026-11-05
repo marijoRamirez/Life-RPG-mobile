@@ -151,6 +151,15 @@ export default function HUDPrincipalScreen() {
               <ClothesIcon size={16} color="#FFFFFF" /> Vestidor
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: "#2A2A35" }]}
+            onPress={() => router.push("/area2_economia/animo/registro")}
+          >
+            {/* TODO(M06): botón temporal para probar el M06. Borrar cuando el M01 conecte la burbuja "¿Cómo te sientes hoy?" (RDF017) */}
+            <Text style={[styles.actionButtonText, { color: "#FFF" }]}>
+              Ánimo
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
       <BottomNav activeTab="home" />
