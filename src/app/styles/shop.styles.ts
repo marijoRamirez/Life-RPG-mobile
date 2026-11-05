@@ -1,285 +1,354 @@
 import { COLORS } from "@/app/area2_economia/tienda/data/tienda";
+import { theme } from "@/constants/theme";
 import { StyleSheet } from "react-native";
 
-// Estilos del módulo de tienda: escaparate, inventario y detalle de recompensa.
-// Los bloques base se comparten para mantener una sola fuente de verdad.
-
-const container = { flex: 1, backgroundColor: COLORS.bg } as const;
-const title = { fontFamily: "RetroTech", fontSize: 26, color: COLORS.text } as const;
-const subtitle = { fontFamily: "RetroTech", fontSize: 13, color: COLORS.muted, marginTop: 2 } as const;
-const grid = { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 12 } as const;
-const card = {
-  width: "48%",
-  backgroundColor: COLORS.surface,
-  borderWidth: 2,
-  borderColor: COLORS.border,
-  borderRadius: 8,
-  padding: 12,
-  gap: 8,
-} as const;
-const emojiBox = {
-  height: 64,
-  borderRadius: 6,
-  backgroundColor: COLORS.surfaceAlt,
-  alignItems: "center",
-  justifyContent: "center",
-} as const;
-const emoji = { fontSize: 34 } as const;
-const filterPillActive = { backgroundColor: COLORS.green, borderColor: COLORS.green } as const;
-const filterTextActive = { color: COLORS.text } as const;
-
-// Inventario de la mascota
-export const inventoryStyles = StyleSheet.create({
-  container,
-  scrollContent: { padding: 16, paddingBottom: 32, gap: 16 },
-
-  title,
-  subtitle,
-
-  // Filtro por tipo
-  filterRow: { flexDirection: "row", gap: 8 },
-  filterPill: {
-    flex: 1,
-    paddingVertical: 9,
-    borderRadius: 20,
-    backgroundColor: COLORS.surfaceAlt,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    alignItems: "center",
-  },
-  filterPillActive,
-  filterText: { fontFamily: "RetroTech", fontSize: 12, color: COLORS.muted },
-  filterTextActive,
-
-  // Cuadrícula
-  grid,
-  card,
-  cardEquipped: { borderColor: COLORS.green },
-  emojiBox,
-  emoji,
-  qtyBadge: {
-    position: "absolute",
-    top: 4,
-    right: 4,
-    backgroundColor: COLORS.amber,
-    borderRadius: 10,
-    minWidth: 24,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    alignItems: "center",
-  },
-  qtyText: { fontFamily: "RetroTech", fontSize: 12, color: "#14141B" },
-  itemName: { fontFamily: "RetroTech", fontSize: 14, color: COLORS.text },
-  tagRow: { flexDirection: "row", alignItems: "center", gap: 6, minHeight: 18 },
-  tagText: { fontFamily: "RetroTech", fontSize: 11, color: COLORS.muted },
-  actionButton: {
-    backgroundColor: COLORS.purple,
-    borderRadius: 6,
-    paddingVertical: 8,
-    alignItems: "center",
-  },
-  actionButtonEquipped: { backgroundColor: COLORS.surfaceAlt },
-  actionText: { fontFamily: "RetroTech", fontSize: 13, color: COLORS.text },
-
-  // Vacío
-  emptyBox: { width: "100%", alignItems: "center", gap: 10, marginTop: 24 },
-  emptyText: { fontFamily: "RetroTech", fontSize: 14, color: COLORS.muted, textAlign: "center" },
-  emptyButton: {
-    backgroundColor: COLORS.green,
-    borderRadius: 8,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-  },
-  emptyButtonText: { fontFamily: "RetroTech", fontSize: 13, color: COLORS.text },
-});
-
-// Escaparate de recompensas
+/* ==========================================================
+ * 4.1 Escaparate de recompensas
+ * ========================================================== */
 export const showcaseStyles = StyleSheet.create({
-  container,
-  scrollContent: { padding: 16, paddingBottom: 32, gap: 16 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  scrollContent: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16, gap: 14 },
 
   // Header
-  title,
-  subtitle,
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  title: { fontFamily: theme.fonts.retro, fontSize: 24, color: COLORS.text },
+  gridButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
-  // Billetera de puntos
+  // Billetera
   walletRow: { flexDirection: "row", gap: 8 },
   walletChip: {
     flex: 1,
-    backgroundColor: COLORS.surface,
-    borderWidth: 2,
-    borderRadius: 8,
-    paddingVertical: 10,
+    flexDirection: "row",
     alignItems: "center",
-    gap: 4,
-  },
-  walletValue: { fontFamily: "RetroTech", fontSize: 18, color: COLORS.text },
-  walletLabel: { fontFamily: "RetroTech", fontSize: 11, color: COLORS.muted },
-
-  // Filtro de categorías
-  filterRow: { gap: 8, paddingRight: 8 },
-  filterPill: {
-    paddingHorizontal: 14,
+    justifyContent: "center",
+    gap: 6,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: COLORS.surfaceAlt,
-    borderWidth: 2,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
     borderColor: COLORS.border,
   },
-  filterPillActive,
-  filterText: { fontFamily: "RetroTech", fontSize: 13, color: COLORS.muted },
-  filterTextActive,
+  walletValue: { fontFamily: theme.fonts.retro, fontSize: 14, color: COLORS.text },
+
+  // Filtros
+  segment: {
+    flexDirection: "row",
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 12,
+    padding: 4,
+  },
+  segmentItem: { flex: 1, paddingVertical: 9, borderRadius: 9, alignItems: "center" },
+  segmentItemActive: { backgroundColor: COLORS.bg },
+  segmentText: { fontSize: 13, fontWeight: "600", color: COLORS.muted },
+  segmentTextActive: { color: COLORS.text, fontWeight: "700" },
 
   // Cuadrícula
-  grid,
-  card,
-  emojiBox,
-  emoji,
-  itemName: { fontFamily: "RetroTech", fontSize: 15, color: COLORS.text },
-  itemDesc: { fontFamily: "RetroTech", fontSize: 11, color: COLORS.muted, minHeight: 30 },
-  priceRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-  priceText: { fontFamily: "RetroTech", fontSize: 16 },
-  buyButton: {
-    backgroundColor: COLORS.green,
-    borderRadius: 6,
-    paddingVertical: 8,
-    alignItems: "center",
+  grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 12 },
+  card: {
+    width: "48%",
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 12,
+    padding: 10,
+    gap: 10,
   },
-  buyButtonDisabled: { backgroundColor: COLORS.surfaceAlt },
-  buyText: { fontFamily: "RetroTech", fontSize: 13, color: COLORS.text },
-  buyTextDisabled: { color: COLORS.muted },
-
-  emptyText: {
-    fontFamily: "RetroTech",
-    fontSize: 14,
-    color: COLORS.muted,
-    textAlign: "center",
-    marginTop: 24,
-    width: "100%",
-  },
-
-  // Botón crear recompensa
-  createButton: {
-    backgroundColor: COLORS.purple,
+  cardLocked: { opacity: 0.55 },
+  iconBox: {
+    height: 48,
     borderRadius: 8,
-    paddingVertical: 14,
+    backgroundColor: COLORS.surfaceAlt,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badge: { position: "absolute", top: 4, right: 6 },
+  badgeText: { fontSize: 9, fontWeight: "700", color: COLORS.muted, letterSpacing: 0.5 },
+  itemName: { fontSize: 13, fontWeight: "700", color: COLORS.text },
+  priceRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  priceText: { fontFamily: theme.fonts.retro, fontSize: 14, color: COLORS.text },
+  priceType: { fontSize: 11, color: COLORS.muted },
+
+  emptyText: { width: "100%", textAlign: "center", color: COLORS.muted, marginTop: 24, fontSize: 13 },
+
+  // Footer
+  footer: { paddingHorizontal: 16, paddingBottom: 12, paddingTop: 4 },
+  createButton: {
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    alignItems: "center",
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  createText: { fontFamily: "RetroTech", fontSize: 15, color: COLORS.text },
+  createText: { fontSize: 14, fontWeight: "700", color: COLORS.text },
 });
 
-// Detalle / creación de recompensa
+/* ==========================================================
+ * 4.2 Detalle de compra · creador
+ * ========================================================== */
 export const itemDetailStyles = StyleSheet.create({
-  container,
-  scrollContent: { padding: 16, paddingBottom: 32, gap: 18 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  scrollContent: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16, gap: 8 },
 
-  header: { flexDirection: "row", alignItems: "center", gap: 12 },
+  // Header
+  header: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 6 },
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 8,
-    backgroundColor: COLORS.surfaceAlt,
+    borderRadius: 10,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
   },
-  backText: { fontFamily: "RetroTech", fontSize: 18, color: COLORS.text },
-  title: { fontFamily: "RetroTech", fontSize: 22, color: COLORS.text },
+  title: { flex: 1, fontFamily: theme.fonts.retro, fontSize: 18, color: COLORS.text },
 
   // Vista previa
   previewCard: {
-    backgroundColor: COLORS.surface,
-    borderWidth: 2,
-    borderRadius: 8,
-    padding: 16,
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
+    gap: 12,
+    padding: 12,
+    borderRadius: 14,
+    backgroundColor: COLORS.greenDark,
+    borderWidth: 1,
+    borderColor: COLORS.greenBorder,
+    marginBottom: 6,
   },
-  previewEmojiBox: {
-    width: 72,
-    height: 72,
-    borderRadius: 8,
-    backgroundColor: COLORS.surfaceAlt,
+  previewIconBox: {
+    width: 48,
+    height: 48,
+    borderRadius: 10,
+    backgroundColor: COLORS.green,
     alignItems: "center",
     justifyContent: "center",
   },
-  previewEmoji: { fontSize: 38 },
-  previewInfo: { flex: 1, gap: 4 },
-  previewName: { fontFamily: "RetroTech", fontSize: 17, color: COLORS.text },
-  previewDesc: { fontFamily: "RetroTech", fontSize: 12, color: COLORS.muted },
-  previewPriceRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 4 },
-  previewPrice: { fontFamily: "RetroTech", fontSize: 18 },
+  previewInfo: { flex: 1, gap: 2 },
+  previewName: { fontSize: 14, fontWeight: "700", color: COLORS.text },
+  previewSub: { fontSize: 11, color: COLORS.muted },
+  previewPrice: { flexDirection: "row", alignItems: "center", gap: 6 },
+  previewPriceText: { fontFamily: theme.fonts.retro, fontSize: 16, color: COLORS.text },
 
-  // Formulario
-  section: { gap: 8 },
-  label: { fontFamily: "RetroTech", fontSize: 14, color: COLORS.text },
-  hint: { fontFamily: "RetroTech", fontSize: 11, color: COLORS.muted },
+  // Secciones
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.8,
+    color: COLORS.muted,
+    marginTop: 8,
+  },
   input: {
     backgroundColor: COLORS.surface,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: COLORS.border,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     color: COLORS.text,
-    fontFamily: "RetroTech",
-    fontSize: 15,
+    fontSize: 14,
   },
-  inputMultiline: { minHeight: 80, textAlignVertical: "top" },
+  inputMultiline: { minHeight: 64, textAlignVertical: "top" },
 
-  // Tipo de puntos
+  // Ícono
+  iconRow: { flexDirection: "row", gap: 8 },
+  iconOption: {
+    flex: 1,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconOptionActive: { borderColor: COLORS.green, borderWidth: 2 },
+
+  // Se paga con
   typeRow: { flexDirection: "row", gap: 8 },
   typeOption: {
     flex: 1,
-    backgroundColor: COLORS.surface,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    borderRadius: 8,
-    paddingVertical: 10,
+    flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    justifyContent: "center",
+    gap: 6,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  typeText: { fontFamily: "RetroTech", fontSize: 12, color: COLORS.muted },
+  typeOptionActive: { backgroundColor: COLORS.green, borderColor: COLORS.green },
+  typeText: { fontSize: 12, fontWeight: "700", color: COLORS.text },
+  typeTextActive: { color: COLORS.ink },
 
   // Precio
-  priceControl: { flexDirection: "row", alignItems: "center", gap: 10 },
+  priceControl: { flexDirection: "row", alignItems: "center", gap: 8 },
   stepButton: {
     width: 44,
     height: 44,
-    borderRadius: 8,
+    borderRadius: 10,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  priceBox: {
+    flex: 1,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: COLORS.surfaceAlt,
+    justifyContent: "center",
+  },
+  priceInput: {
+    textAlign: "center",
+    fontFamily: theme.fonts.retro,
+    fontSize: 20,
+    color: COLORS.text,
+    padding: 0,
+  },
+  hint: { fontSize: 11, color: COLORS.muted },
+
+  // Consumible
+  switchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 8,
+  },
+  switchTitle: { fontSize: 14, fontWeight: "700", color: COLORS.text },
+  switchSub: { fontSize: 11, color: COLORS.muted, marginTop: 2 },
+
+  // Footer
+  footer: { paddingHorizontal: 16, paddingBottom: 16, paddingTop: 8 },
+  saveButton: {
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  saveButtonDisabled: { opacity: 0.5 },
+  saveText: { fontSize: 14, fontWeight: "700", color: COLORS.text },
+});
+
+/* ==========================================================
+ * 4.3 Inventario
+ * ========================================================== */
+export const inventoryStyles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  scrollContent: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16, gap: 10 },
+
+  // Header
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 4,
+  },
+  title: { fontFamily: theme.fonts.retro, fontSize: 24, color: COLORS.text },
+  count: { fontSize: 12, color: COLORS.muted },
+
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.8,
+    color: COLORS.muted,
+    marginTop: 8,
+  },
+  emptyText: { fontSize: 12, color: COLORS.muted },
+
+  // Recompensas activas
+  rewardCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    padding: 12,
+    borderRadius: 14,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  rewardIconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
     backgroundColor: COLORS.surfaceAlt,
     alignItems: "center",
     justifyContent: "center",
   },
-  stepText: { fontFamily: "RetroTech", fontSize: 20, color: COLORS.text },
-  priceInput: { flex: 1, textAlign: "center", fontSize: 20 },
-
-  // Íconos
-  emojiRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  emojiOption: {
-    width: 48,
-    height: 48,
+  rewardInfo: { flex: 1, gap: 2 },
+  rewardName: { fontSize: 14, fontWeight: "700", color: COLORS.text },
+  rewardSub: { fontSize: 11, color: COLORS.muted },
+  redeemButton: {
+    backgroundColor: COLORS.green,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
     borderRadius: 8,
+  },
+  redeemText: { fontSize: 12, fontWeight: "700", color: COLORS.ink },
+
+  // Consumibles
+  consumableRow: { flexDirection: "row", gap: 8 },
+  consumableCard: {
+    flex: 1,
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 14,
+    paddingHorizontal: 6,
+    borderRadius: 12,
     backgroundColor: COLORS.surface,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: COLORS.border,
+  },
+  qty: { position: "absolute", top: 6, right: 8, fontSize: 10, fontWeight: "700", color: COLORS.amber },
+  consumableName: { fontSize: 11, fontWeight: "700", color: COLORS.text, textAlign: "center" },
+  consumableUse: { fontSize: 10, color: COLORS.muted },
+
+  // Ropa
+  clothingRow: { flexDirection: "row", gap: 8 },
+  clothingTile: {
+    flex: 1,
+    alignItems: "center",
+    gap: 4,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  clothingTileActive: { borderColor: COLORS.green, borderWidth: 2 },
+  clothingName: { fontSize: 11, fontWeight: "700", color: COLORS.text },
+
+  // Footer
+  footer: { paddingHorizontal: 16, paddingBottom: 12, paddingTop: 4 },
+  wardrobeButton: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 8,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  emojiOptionActive: { borderColor: COLORS.green, backgroundColor: COLORS.surfaceAlt },
-  emojiOptionText: { fontSize: 24 },
-
-  // Botón guardar
-  saveButton: {
-    backgroundColor: COLORS.green,
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  saveButtonDisabled: { backgroundColor: COLORS.surfaceAlt },
-  saveText: { fontFamily: "RetroTech", fontSize: 16, color: COLORS.text },
-  saveTextDisabled: { color: COLORS.muted },
+  wardrobeText: { fontSize: 14, fontWeight: "700", color: COLORS.text },
 });
