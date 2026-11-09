@@ -9,7 +9,7 @@ import { PixelIcon } from "@/components/ui/PixelIcons";
 import { MISSION_TYPE_META } from "@/constants/missionTypes";
 import { theme } from "@/constants/theme";
 import type { MissionType } from "@/models/Mission";
-import { focusStyles as styles, shared } from "../../styles/missions.styles";
+import { focusStyles as styles, shared } from "@/styles/missions.styles";
 import { useFocusSessionViewModel } from "@/viewmodels/useFocusSessionViewModel";
 
 const HABITAT: Record<MissionType, { badge: string; speech: string }> = {

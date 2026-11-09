@@ -2,7 +2,7 @@ import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { MISSION_COLORS } from "@/constants/missionTypes";
 import { theme } from "@/constants/theme";
-import { shared } from "@/app/styles/missions.styles";
+import { shared } from "@/styles/missions.styles";
 
 type Props = {
   visible: boolean;

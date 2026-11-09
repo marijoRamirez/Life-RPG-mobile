@@ -22,21 +22,52 @@ El proyecto utiliza un flujo unidireccional para garantizar la separación de re
 
 ## Estructura de Carpetas
 
-### Rutas de la Aplicación (Expo Router)
+Organización **por capas**: cada carpeta es una capa de MVVM y dentro de ella hay un archivo por módulo.
 
-Las pantallas se organizan físicamente por el área de impacto en la carpeta `src/app/`:
+```
+src/
+├─ app/                      VIEW · pantallas (Expo Router: la ruta del archivo es la URL)
+│  ├─ _layout.tsx            Navegador raíz y carga de la fuente RetroTech
+│  ├─ index.tsx              Casa / HUD principal (M01)
+│  ├─ area1_jugabilidad/     habitos/ (M02) · looks-vestidor/ y perfil/ (M01) · misiones/ (M03)
+│  └─ area2_economia/        tienda/ (M04) · logros/ (M05) · animo/ (M06)
+├─ components/               VIEW · piezas visuales reutilizables
+│  ├─ ui/                    Compartidas: BottomNav, PixelIcons, ComingSoon
+│  └─ misiones/ tienda/ animo/   Propias de cada módulo
+├─ viewmodels/               VIEWMODEL · un hook por pantalla (useXxxViewModel.ts)
+├─ services/                 SERVICE · un archivo por módulo (xxxService.ts) + apiClient.ts
+├─ models/                   MODEL · interfaces y tipos, sin lógica
+├─ constants/                Tema global (theme.ts) y constantes por módulo (xxxTypes.ts)
+└─ styles/                   Estilos por módulo (xxx.styles.ts)
+```
 
-- `(area1_jugabilidad)/`: Rutas de Tamagotchi, perfil, hábitos y misiones.
-- `(area2_economia)/`: Rutas de tienda, logros y estado de ánimo.
-- _(Las áreas 3 y 4 corresponden al cliente PWA)_.
+> ⚠️ **Dentro de `src/app/` solo van pantallas.** Expo Router trata cualquier archivo ahí como una ruta, así que estilos, datos o componentes van en sus carpetas, nunca en `app/`.
+
+### Qué hay de cada módulo
+
+| Módulo | View (`app/`) | ViewModel | Service | Model | Constantes / estilos |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| M01 Casa | `index.tsx` | `useTamagotchiViewModel` | `tamagotchiService` | `Tamagotchi`, `UserProfile` | `home.styles` |
+| M01 Vestidor | `looks-vestidor/` | `useWardrobeViewModel`, `useSaveLookViewModel` | `wardrobeService` | `Wardrobe` | `looks.styles` |
+| M03 Misiones | `misiones/` | `useMissionBoard…`, `useFocusSession…`, `useMissionHistory…` | `missionService` | `Mission` | `missionTypes`, `missions.styles` |
+| M04 Tienda | `tienda/` | `useShopShowcase…`, `useRewardCreator…`, `useInventory…` | `shopService` | `Item` | `shopTypes`, `shop.styles` |
+| M06 Ánimo | `animo/` | `useMoodRegister…`, `useMoodChart…`, `useMoodJournal…` | `moodService` | `MoodLog` | `moodTypes`, `mood.styles` |
+| M02 Hábitos · M05 Logros · Perfil | Pantallas "En construcción" (`ComingSoon`) | — | — | `Quest` (pendiente) | — |
+
+### Cómo agregar o terminar una pantalla
+
+1. **Model**: define los tipos en `src/models/` (sin lógica).
+2. **Service**: en `src/services/xxxService.ts` una función por endpoint. Mientras no exista el backend, devuelve datos simulados con el endpoint real en un comentario; después solo se cambia el cuerpo por `apiClient(...)`.
+3. **ViewModel**: en `src/viewmodels/useXxxViewModel.ts` maneja estados (carga, error), validaciones y deja los datos listos para mostrar.
+4. **View**: en `src/app/...` la pantalla solo dibuja y llama al ViewModel (`const vm = useXxxViewModel()`). Nada de datos ni lógica dentro.
+5. **Estilos y constantes**: en `src/styles/xxx.styles.ts` y `src/constants/xxxTypes.ts`, usando los colores de `theme.ts`.
+6. Antes del PR corre `npx tsc --noEmit`; debe dar **0 errores**.
 
 ### Carpetas Compartidas
 
-- **`assets/`**: Recursos estáticos como `images/`, `fonts/` (ej. tipografía RetroTech) y animaciones de la mascota.
-- **`src/components/`**: Componentes visuales genéricos (`ui/` como botones, modales, `BottomNav`) y específicos (`tamagotchi/`, `gamificacion/`).
-- **`src/constants/`**: Archivo `theme.ts` con la paleta de colores global y modo oscuro/claro centralizado.
-- **`src/styles/`**: Archivos de estilos compartidos (ej. `index.styles.ts`).
-- **`src/hooks/`**: Hooks utilitarios genéricos que no son de negocio (ej. `useTheme`).
+- **`assets/`**: Recursos estáticos como `images/` (mascotas) y `fonts/` (tipografía RetroTech).
+- **`src/components/ui/`**: `BottomNav`, `PixelIcons` (todos los íconos de la app) y `ComingSoon` (pantalla temporal para rutas pendientes).
+- **`src/services/apiClient.ts`**: cliente HTTP base (URL de `EXPO_PUBLIC_API_URL` en `.env` y token de sesión).
 
 ---
 

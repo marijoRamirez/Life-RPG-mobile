@@ -1,4 +1,4 @@
-import { COLORS } from "@/app/area2_economia/tienda/data/tienda";
+import { SHOP_COLORS as COLORS } from "@/constants/shopTypes";
 import { theme } from "@/constants/theme";
 import { StyleSheet } from "react-native";
 

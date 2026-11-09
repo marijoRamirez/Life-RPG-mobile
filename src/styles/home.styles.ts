@@ -205,8 +205,4 @@ export const homeStyles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: theme.colors.surfaceAlt,
   },
-  navItem: { alignItems: "center" },
-  navIcon: { fontSize: 20, color: theme.colors.textSecondary, marginBottom: 4 },
-  navLabel: { fontSize: 10, color: theme.colors.textSecondary },
-  navActive: { color: theme.colors.yellow },
 });

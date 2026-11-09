@@ -1,48 +1,23 @@
-import { router, Stack, useRouter } from "expo-router";
-import { useState } from "react";
-import {
-  Image,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Stack, useRouter } from "expo-router";
+import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ClothesIcon, PixelIcon } from "@/components/ui/PixelIcons";
 import { theme } from "@/constants/theme";
-import { saveLookStyles as styles } from "../../styles/looks.styles";
+import { saveLookStyles as styles } from "@/styles/looks.styles";
+import { useSaveLookViewModel } from "@/viewmodels/useSaveLookViewModel";
 
+// Guardar look (M01)
 export default function GuardarLook() {
-  const route = useRouter();
+  const router = useRouter();
+  const vm = useSaveLookViewModel();
 
-  // y aqui el nombre del look
-  const [lookName, setLookName] = useState("Lector nocturno");
-  //eto es la simulasao
-  const savedLooks = [
-    {
-      id: 1,
-      name: "Lector nocturno",
-      details: "Boina de lector · Lentes redondos · La Casa",
-      color: "#9C27B0",
-      inUse: true,
-    },
-    {
-      id: 2,
-      name: "Corredor matutino",
-      details: "Banda deportiva · Lentes de sol · Bosque",
-      color: "#FF5722",
-      inUse: false,
-    },
-    {
-      id: 3,
-      name: "Modo monje",
-      details: "Gorro de lana · Sudadera · La Casa",
-      color: "#03A9F4",
-      inUse: false,
-    },
-  ];
+  const handleSave = async () => {
+    if (await vm.save()) {
+      if (router.canGoBack()) router.back();
+      else router.replace("/area1_jugabilidad/looks-vestidor/vestidor");
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
@@ -51,61 +26,42 @@ export default function GuardarLook() {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.headerIcon}
-            onPress={() => route.back()}
+            onPress={() => router.back()}
             accessibilityRole="button"
             accessibilityLabel="Volver"
           >
-            <PixelIcon
-              name="chevron-left"
-              size={24}
-              color={theme.colors.textPrimary}
-            />
+            <PixelIcon name="chevron-left" size={24} color={theme.colors.textPrimary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Guardar Look</Text>
         </View>
 
         <View style={styles.lookCard}>
           <View style={styles.lookImageContainer}>
-            <Image
-              source={require("../../../../assets/images/gato.png")}
-              style={styles.mascotaImage}
-              resizeMode="contain"
-            />
+            <Image source={require("@/assets/images/gato.png")} style={styles.mascotaImage} resizeMode="contain" />
           </View>
 
-          {/* checkpoint para saber donde modificar cuando se integre el back */}
+          {/* Lo que lleva puesto en cada parte (viene del servicio) */}
           <View style={styles.lookDetails}>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Cabeza</Text>
-              <Text style={styles.detailValue}>Gorrito del lectorcito</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Cara</Text>
-              <Text style={styles.detailValue}>Lentes redonditos</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Cuerpo</Text>
-              <Text style={styles.detailValue}>Sudadera</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Fondo</Text>
-              <Text style={styles.detailValue}>Casita</Text>
-            </View>
+            {vm.slotRows.map((row) => (
+              <View key={row.label} style={styles.detailRow}>
+                <Text style={styles.detailLabel}>{row.label}</Text>
+                <Text style={styles.detailValue}>{row.value}</Text>
+              </View>
+            ))}
           </View>
         </View>
+
         <View style={styles.inputSection}>
           <Text style={styles.inputLabel}>Nombre del look</Text>
           <TextInput
             style={styles.textInput}
-            value={lookName}
-            onChangeText={(text) => {
-              if (text.length <= 24) setLookName(text); //luego veo si cambio el limite de caracteres
-            }}
+            value={vm.lookName}
+            onChangeText={vm.setLookName}
             placeholder="Introduce el nombre"
             placeholderTextColor={theme.colors.textSecondary}
           />
           <Text style={styles.inputSubtext}>
-            Hasta 24 caracteres. Se guarda en el servidor.
+            {vm.error ?? `Hasta ${vm.nameMax} caracteres. Se guarda en el servidor.`}
           </Text>
         </View>
 
@@ -113,21 +69,14 @@ export default function GuardarLook() {
           <View style={styles.alertIcon}>
             <PixelIcon name="info" size={16} color="#00BCD4" />
           </View>
-          <Text style={styles.alertText}>
-            Tus amigos verán este look en tu Perfil Espejo (M07).
-          </Text>
+          <Text style={styles.alertText}>Tus amigos verán este look en tu Perfil Espejo (M07).</Text>
         </View>
 
         <Text style={styles.sectionTitle}>Looks Guardados</Text>
         <View style={styles.looksList}>
-          {savedLooks.map((item) => (
+          {vm.savedLooks.map((item) => (
             <View key={item.id} style={styles.lookItem}>
-              <View
-                style={[
-                  styles.lookIconWrapper,
-                  { backgroundColor: "rgba(255,255,255,0.05)" },
-                ]}
-              >
+              <View style={[styles.lookIconWrapper, { backgroundColor: "rgba(255,255,255,0.05)" }]}>
                 <ClothesIcon size={20} color={item.color} />
               </View>
 
@@ -142,7 +91,7 @@ export default function GuardarLook() {
                   <Text style={styles.badgeInUseText}>En uso</Text>
                 </View>
               ) : (
-                <TouchableOpacity style={[styles.badge, styles.useButton]}>
+                <TouchableOpacity style={[styles.badge, styles.useButton]} onPress={() => vm.applyLook(item.id)}>
                   <Text style={styles.useButtonText}>Usar</Text>
                 </TouchableOpacity>
               )}
@@ -150,14 +99,11 @@ export default function GuardarLook() {
           ))}
         </View>
         <TouchableOpacity
-          style={styles.saveButton}
-          onPress={() =>
-            router.push("/area1_jugabilidad/looks-vestidor/vestidor")
-          }
+          style={[styles.saveButton, !vm.canSave && { opacity: 0.45 }]}
+          disabled={!vm.canSave}
+          onPress={handleSave}
         >
-          <Text style={styles.saveButtonText}>
-            Guardar look(solo regresa al vestidor)
-          </Text>
+          <Text style={styles.saveButtonText}>{vm.saving ? "Guardando…" : "Guardar look"}</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

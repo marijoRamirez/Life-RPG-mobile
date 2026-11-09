@@ -2,11 +2,11 @@ import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { theme } from "../../constants/theme";
-import { PixelIcon } from "./PixelIcons";
+import { PixelIcon, type PixelIconName } from "./PixelIcons";
 
 // La barra va al final de la pantalla (no flota sobre el contenido) y suma
 // el alto de la barra de navegación del sistema para no quedar debajo de ella.
-export function BottomNav({ activeTab }: { activeTab: string }) {
+export function BottomNav({ activeTab }: { activeTab: PixelIconName }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -47,10 +47,10 @@ export function BottomNav({ activeTab }: { activeTab: string }) {
       accessibilityRole="tablist"
     >
       <NavItem name="home" label="Casa" route="/" />
-      <NavItem name="check" label="Hábitos" route="/habitos/checkin" />
+      <NavItem name="check" label="Hábitos" route="/area1_jugabilidad/habitos/checkin" />
       <NavItem name="flag" label="Misiones" route="/area1_jugabilidad/misiones/tablero" />
       <NavItem name="shop" label="Tienda" route="/area2_economia/tienda/escaparate" />
-      <NavItem name="trophy" label="Progreso" route="/logros/vitrina" />
+      <NavItem name="trophy" label="Progreso" route="/area2_economia/logros/vitrina" />
     </View>
   );
 }
