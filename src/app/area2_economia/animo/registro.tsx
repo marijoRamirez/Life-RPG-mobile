@@ -6,7 +6,7 @@ import { PixelIcon } from "@/components/ui/PixelIcons";
 import { ENERGY_MAX, MOOD_COLORS, MOOD_FACTORS, MOOD_LEVELS, MOOD_META, MOOD_XP_REWARD } from "@/constants/moodTypes";
 import { theme } from "@/constants/theme";
 import { useMoodRegisterViewModel } from "@/viewmodels/useMoodRegisterViewModel";
-import { moodShared as shared, registerStyles as styles } from "../../styles/mood.styles";
+import { moodShared as shared, registerStyles as styles } from "@/styles/mood.styles";
 
 const ENERGY_STEPS = Array.from({ length: ENERGY_MAX }, (_, i) => i + 1);
 

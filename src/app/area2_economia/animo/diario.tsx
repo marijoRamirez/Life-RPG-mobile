@@ -22,7 +22,7 @@ import { useMoodJournalViewModel } from "@/viewmodels/useMoodJournalViewModel";
 import {
     moodShared as shared,
     journalStyles as styles,
-} from "../../styles/mood.styles";
+} from "@/styles/mood.styles";
 
 // 6.3 Diario rápido (RF021)
 export default function DiarioAnimoScreen() {

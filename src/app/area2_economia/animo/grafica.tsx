@@ -9,7 +9,7 @@ import { MOOD_COLORS } from "@/constants/moodTypes";
 import { theme } from "@/constants/theme";
 import type { MoodPeriod } from "@/models/MoodLog";
 import { useMoodChartViewModel } from "@/viewmodels/useMoodChartViewModel";
-import { chartStyles as styles, moodShared as shared } from "../../styles/mood.styles";
+import { chartStyles as styles, moodShared as shared } from "@/styles/mood.styles";
 
 const PERIODS: { key: MoodPeriod; label: string }[] = [
   { key: "semana", label: "Semana" },

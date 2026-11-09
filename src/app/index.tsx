@@ -1,35 +1,19 @@
-import {
-  Image,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-
-import {
-  CheckIcon,
-  ClothesIcon,
-  FocusIcon,
-  MoonIcon,
-  PixelIcon,
-} from "@/components/ui/PixelIcons";
 import { useRouter } from "expo-router";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomNav } from "@/components/ui/BottomNav";
-import { homeStyles as styles } from "./styles/home.styles";
+import { CheckIcon, ClothesIcon, FocusIcon, MoonIcon, PixelIcon, type PixelIconName } from "@/components/ui/PixelIcons";
+import { homeStyles as styles } from "@/styles/home.styles";
+import { useTamagotchiViewModel } from "@/viewmodels/useTamagotchiViewModel";
 
+// Casa / HUD principal (M01)
 export default function HUDPrincipalScreen() {
-  const router = useRouter(); //el coso para las rutas
+  const router = useRouter();
+  const vm = useTamagotchiViewModel();
+
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0 },
-      ]}
-    >
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <View style={styles.headerProfile}>
@@ -37,97 +21,74 @@ export default function HUDPrincipalScreen() {
               <Text style={styles.avatarText}></Text>
             </View>
             <View>
-              <Text style={styles.dateText}>Jueves 8 de octubre</Text>
-              <Text style={styles.greetingText}>Hola, Yess</Text>
+              <Text style={styles.dateText}>{vm.dateText}</Text>
+              <Text style={styles.greetingText}>{vm.greeting}</Text>
             </View>
           </View>
           <View style={styles.toggleButton}>
             <MoonIcon size={16} color="#FFFFFF" />
           </View>
         </View>
+
         <View style={styles.card}>
           <View style={styles.levelRow}>
             <View style={styles.levelBadge}>
               <Text style={styles.levelLabel}>LV</Text>
-              <Text style={styles.levelNumber}>14</Text>
+              <Text style={styles.levelNumber}>{vm.level}</Text>
             </View>
             <View style={styles.nameContainer}>
-              <Text style={styles.mascotaName}>
-                Susi Botitas · Guardián del Enfoque
-              </Text>
-              <Text style={styles.xpText}>1240 / 1800 XP para nivel 15</Text>
+              <Text style={styles.mascotaName}>{vm.petTitle}</Text>
+              <Text style={styles.xpText}>{vm.xpText}</Text>
             </View>
           </View>
 
           <View style={styles.barRow}>
             <Text style={styles.barIcon}>HP</Text>
             <View style={styles.barBackground}>
-              <View
-                style={[
-                  styles.barFill,
-                  { backgroundColor: "#4CAF50", width: "82%" },
-                ]}
-              />
+              <View style={[styles.barFill, { backgroundColor: "#4CAF50", width: vm.hpWidth as `${number}%` }]} />
             </View>
-            <Text style={styles.barValue}>82/100</Text>
+            <Text style={styles.barValue}>{vm.hpText}</Text>
           </View>
 
           <View style={styles.barRow}>
             <Text style={styles.barIcon}>XP</Text>
             <View style={styles.barBackground}>
-              <View
-                style={[
-                  styles.barFill,
-                  { backgroundColor: "#FFC107", width: "69%" },
-                ]}
-              />
+              <View style={[styles.barFill, { backgroundColor: "#FFC107", width: vm.xpPercent as `${number}%` }]} />
             </View>
-            <Text style={styles.barValue}>69%</Text>
+            <Text style={styles.barValue}>{vm.xpPercent}</Text>
           </View>
         </View>
 
         <View style={styles.tamagotchiCard}>
           <View style={styles.habitatBadge}>
-            <Text style={styles.habitatText}>Hábitat del bosque</Text>
+            <Text style={styles.habitatText}>{vm.habitat}</Text>
           </View>
 
-          <View style={styles.speechBubble}>
-            <Text style={styles.speechText}>
-              ¿Cómo te sientes{"\n"}hoy? Toca para{"\n"}contarme.
-            </Text>
-          </View>
+          {/* RDF017: burbuja que abre el Registro rápido de ánimo (M06) mientras no haya registro del día */}
+          {vm.showMoodBubble && (
+            <TouchableOpacity
+              style={styles.speechBubble}
+              onPress={() => router.push("/area2_economia/animo/registro")}
+              accessibilityRole="button"
+              accessibilityLabel="Registrar cómo te sientes hoy"
+            >
+              <Text style={styles.speechText}>¿Cómo te sientes{"\n"}hoy? Toca para{"\n"}contarme.</Text>
+            </TouchableOpacity>
+          )}
 
-          <Image
-            source={require("../../assets/images/gato.png")}
-            style={{ width: 128, height: 128 }}
-            resizeMode="contain"
-          />
+          <Image source={require("@/assets/images/gato.png")} style={{ width: 128, height: 128 }} resizeMode="contain" />
         </View>
 
         <View style={styles.attributesContainer}>
-          <AttributeBar
-            label="Puntos de Cultura"
-            icon="book-open"
-            value="340"
-            progress="70%"
-          />
-          <AttributeBar
-            label="Puntos Físicos"
-            icon="dumbbell"
-            value="210"
-            progress="40%"
-          />
-          <AttributeBar
-            label="Puntos de Enfoque"
-            icon="focus"
-            value="480"
-            progress="90%"
-          />
+          {vm.attributeRows.map((row) => (
+            <AttributeBar key={row.key} label={row.label} icon={row.icon} value={row.value} progress={row.progress} />
+          ))}
         </View>
 
         <View style={styles.actionsRow}>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: "#4CAF50" }]}
+            onPress={() => router.push("/area1_jugabilidad/habitos/checkin")}
           >
             <Text style={[styles.actionButtonText, { color: "#FFFFFF" }]}>
               <CheckIcon size={16} color="#FFFFFF" /> Check-in
@@ -143,21 +104,10 @@ export default function HUDPrincipalScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: "#9C27B0" }]}
-            onPress={() =>
-              router.push("/area1_jugabilidad/looks-vestidor/vestidor")
-            }
+            onPress={() => router.push("/area1_jugabilidad/looks-vestidor/vestidor")}
           >
             <Text style={[styles.actionButtonText, { color: "#FFF" }]}>
               <ClothesIcon size={16} color="#FFFFFF" /> Vestidor
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: "#2A2A35" }]}
-            onPress={() => router.push("/area2_economia/animo/registro")}
-          >
-            {/* TODO(M06): botón temporal para probar el M06. Borrar cuando el M01 conecte la burbuja "¿Cómo te sientes hoy?" (RDF017) */}
-            <Text style={[styles.actionButtonText, { color: "#FFF" }]}>
-              Ánimo
             </Text>
           </TouchableOpacity>
         </View>
@@ -167,6 +117,7 @@ export default function HUDPrincipalScreen() {
   );
 }
 
+// Barra de puntos por tipo (Cultura, Físico, Enfoque)
 const AttributeBar = ({
   label,
   icon,
@@ -174,13 +125,13 @@ const AttributeBar = ({
   progress,
 }: {
   label: string;
-  icon: React.ComponentProps<typeof PixelIcon>["name"] | React.ReactNode;
+  icon: PixelIconName;
   value: string;
   progress: string;
 }) => (
   <View style={styles.attributeRow}>
     <View style={styles.attributeIconBox}>
-      <PixelIcon name={icon as any} size={24} color="#FFFFFF" />
+      <PixelIcon name={icon} size={24} color="#FFFFFF" />
     </View>
     <View style={styles.attributeContent}>
       <View style={styles.attributeTextRow}>
@@ -188,23 +139,8 @@ const AttributeBar = ({
         <Text style={styles.attributeValue}>{value}</Text>
       </View>
       <View style={styles.barBackgroundAttr}>
-        <View style={[styles.barFillAttr, { width: progress as any }]} />
+        <View style={[styles.barFillAttr, { width: progress as `${number}%` }]} />
       </View>
     </View>
-  </View>
-);
-
-const NavItem = ({
-  icon,
-  label,
-  active = false,
-}: {
-  icon: string;
-  label: string;
-  active?: boolean;
-}) => (
-  <View style={styles.navItem}>
-    <Text style={[styles.navIcon, active && styles.navActive]}>{icon}</Text>
-    <Text style={[styles.navLabel, active && styles.navActive]}>{label}</Text>
   </View>
 );
