@@ -40,12 +40,6 @@ export interface MoodReminder {
   time: string; // HH:mm, p. ej. "20:00"
 }
 
-// Privacidad del registro según Ajustes › Privacidad (RDF071)
-export interface MoodPrivacy {
-  visibleToViewers: boolean;
-  viewersCount: number;
-}
-
 export type MoodPeriod = "semana" | "mes";
 
 // Un punto de la serie diaria (RDF072). Null si ese día no hubo registro.

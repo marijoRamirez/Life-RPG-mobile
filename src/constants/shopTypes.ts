@@ -1,8 +1,8 @@
 // Constantes visuales y textos del Módulo 4 (Tienda de la mascota).
 
-import type { PixelIconName } from "@/components/ui/PixelIcons";
 import { theme } from "@/constants/theme";
-import type { ItemIconName, PointType } from "@/models/Item";
+import type { PointType } from "@/models/common";
+import type { ItemIconName } from "@/models/Item";
 
 export const SHOP_COLORS = {
   bg: theme.colors.background,
@@ -18,14 +18,6 @@ export const SHOP_COLORS = {
   purple: theme.colors.purple,
   ink: "#0E1226", // Texto oscuro sobre botones verdes
 };
-
-export const POINT_META: Record<PointType, { label: string; icon: PixelIconName }> = {
-  cultura: { label: "Cultura", icon: "book-open" },
-  fisico: { label: "Físico", icon: "dumbbell" },
-  enfoque: { label: "Enfoque", icon: "focus" },
-};
-
-export const POINT_TYPES: PointType[] = ["cultura", "fisico", "enfoque"];
 
 export type ShopFilter = "todo" | PointType;
 

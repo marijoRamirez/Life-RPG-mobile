@@ -13,7 +13,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AddIcon, ChevronLeftIcon, MinusIcon, PixelIcon } from "@/components/ui/PixelIcons";
-import { ICON_OPTIONS, POINT_META, POINT_TYPES, SHOP_COLORS as COLORS } from "@/constants/shopTypes";
+import { POINT_META, POINT_TYPES } from "@/constants/pointTypes";
+import { ICON_OPTIONS, SHOP_COLORS as COLORS } from "@/constants/shopTypes";
 import { itemDetailStyles as styles } from "@/styles/shop.styles";
 import { useRewardCreatorViewModel } from "@/viewmodels/useRewardCreatorViewModel";
 

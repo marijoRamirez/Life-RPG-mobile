@@ -2,8 +2,10 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 
 import type { ShopFilter } from "@/constants/shopTypes";
-import type { ShopItem, Wallet } from "@/models/Item";
-import { buyItem, getShopItems, getWallet } from "@/services/shopService";
+import type { Wallet } from "@/models/common";
+import type { ShopItem } from "@/models/Item";
+import { buyItem, getShopItems } from "@/services/shopService";
+import { getPoints } from "@/services/userService";
 
 // ViewModel de 4.1 Escaparate.
 // Carga puntos y artículos, filtra por tipo y valida las compras.
@@ -21,7 +23,7 @@ export function useShopShowcaseViewModel() {
     setLoading(true);
     setError(null);
     try {
-      const [w, list] = await Promise.all([getWallet(), getShopItems()]);
+      const [w, list] = await Promise.all([getPoints(), getShopItems()]);
       setWallet(w);
       setItems(list);
     } catch {

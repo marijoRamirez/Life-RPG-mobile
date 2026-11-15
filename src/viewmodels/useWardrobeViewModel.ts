@@ -1,17 +1,18 @@
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 
-import type { StatPoints, WardrobeCategory, WardrobeItem } from "@/models/Wardrobe";
-import { getCurrentLook, getStatPoints, getWardrobe } from "@/services/wardrobeService";
+import { WARDROBE_CATEGORIES } from "@/constants/wardrobeTypes";
+import type { Wallet } from "@/models/common";
+import type { WardrobeCategory, WardrobeItem } from "@/models/Wardrobe";
+import { getPoints } from "@/services/userService";
+import { getCurrentLook, getWardrobe } from "@/services/wardrobeService";
 
 // ViewModel del Vestidor (M01).
-
-export const WARDROBE_CATEGORIES: WardrobeCategory[] = ["Cabeza", "Cara", "Cuerpo", "Fondo"];
 
 export function useWardrobeViewModel() {
   const [activeTab, setActiveTab] = useState<WardrobeCategory>("Cara");
   const [items, setItems] = useState<WardrobeItem[]>([]);
-  const [stats, setStats] = useState<StatPoints | null>(null);
+  const [stats, setStats] = useState<Wallet | null>(null);
   const [lookName, setLookName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +21,7 @@ export function useWardrobeViewModel() {
     setLoading(true);
     setError(null);
     try {
-      const [list, points, look] = await Promise.all([getWardrobe(), getStatPoints(), getCurrentLook()]);
+      const [list, points, look] = await Promise.all([getWardrobe(), getPoints(), getCurrentLook()]);
       setItems(list);
       setStats(points);
       setLookName(look.name);

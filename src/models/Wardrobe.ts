@@ -2,26 +2,18 @@
 // Solo definen la forma de los datos; no contienen lógica.
 
 import type { PixelIconName } from "@/components/ui/PixelIcons";
+import type { PointType } from "@/models/common";
 
 export type WardrobeCategory = "Cabeza" | "Cara" | "Cuerpo" | "Fondo";
 
-export type StatName = "Cultura" | "Físico" | "Enfoque";
-
 export interface WardrobeItem {
-  id: number;
+  id: string;
   name: string;
-  stat: StatName;
+  stat: PointType; // Tipo de puntos al que pertenece
   icon: PixelIconName;
   status: string; // "Equipado", "Tuyo", "120 pts", "Logro", "LV 18"…
   equipped: boolean;
   category: WardrobeCategory;
-}
-
-// Puntos que se muestran arriba del vestidor
-export interface StatPoints {
-  cultura: number;
-  fisico: number;
-  enfoque: number;
 }
 
 // Lo que lleva puesto la mascota en cada parte
@@ -33,7 +25,7 @@ export interface CurrentLook {
 }
 
 export interface SavedLook {
-  id: number;
+  id: string;
   name: string;
   details: string;
   color: string;
