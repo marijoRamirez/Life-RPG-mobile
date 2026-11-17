@@ -1,3 +1,21 @@
+# Reglas de este proyecto (Life-RPG móvil)
+
+Lee `README.md` (estructura y estándar) y `docs/API.md` (contrato con el backend) antes de cambiar código. Lo esencial:
+
+- **MVVM por capas.** View (`src/app`, `src/components`) → ViewModel (`src/viewmodels`) → Service (`src/services`) → `apiClient`. Las pantallas no tienen datos ni lógica; solo llaman a su ViewModel.
+- **Dentro de `src/app/` solo van pantallas** (Expo Router convierte cada archivo en ruta). Estilos en `src/styles`, constantes en `src/constants`, tipos en `src/models`.
+- **Backend: Node + Express** en `/api/v1`. El contrato es `docs/API.md`; si una ruta o un dato cambia, actualiza primero ese archivo.
+- **Cada servicio tiene dos mitades**: `real ? api.<método>(ENDPOINTS…) : mock.<función>()`. La API real siempre pasa por `api` de `src/services/apiClient.ts` con rutas de `src/constants/endpoints.ts`; nunca `fetch` directo ni URLs a mano. Los datos simulados van en `src/services/mocks/` y devuelven lo mismo que la API.
+- **No leas `process.env` fuera de `src/config/env.ts`.** Los módulos conectados se controlan con `EXPO_PUBLIC_API_MODULES`.
+- **Datos:** IDs siempre `string`; fechas ISO 8601 (`AAAA-MM-DD` para días); campos en inglés `camelCase`; tipos de puntos `"cultura" | "fisico" | "enfoque"` (`PointType` de `src/models/common.ts`). No dupliques tipos ni datos que ya existen (los puntos del usuario salen de `userService.getPoints()`).
+- **Errores:** el backend responde `{ "error": "mensaje" }`; llega como `ApiError`. En los ViewModels usa `try / catch / finally` y muestra `error.message`.
+- **Reglas de negocio en el servidor.** El móvil no calcula XP, saldos ni recompensas.
+- **Código y comentarios** en el estilo del repo: nombres en inglés, comentarios y textos en español, con el RF/RDF cuando aplique.
+- Gestor de paquetes: **pnpm** (no generes `package-lock.json`). No agregues dependencias sin acordarlo con el equipo.
+- Trabaja en una rama por módulo (`feat/mXX-nombre`) y abre Pull Request; no hagas push directo a `main`.
+
+---
+
 This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
 
 ## Expo has changed — do not trust your training data

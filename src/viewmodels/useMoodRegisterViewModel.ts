@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 
-import type { MoodFactor, MoodLevel, MoodPrivacy, MoodReminder } from "@/models/MoodLog";
+import type { MoodFactor, MoodLevel, MoodReminder } from "@/models/MoodLog";
+import type { PrivacySettings } from "@/models/UserProfile";
 import {
-  getMoodPrivacy,
   getMoodReminder,
   getTodayMoodLog,
   registerMood,
 } from "@/services/moodService";
+import { getPrivacy } from "@/services/userService";
 
 // ViewModel de 6.1 Registro rápido (RF019).
 // Maneja la selección de ánimo, energía y factores, y el envío del registro.
@@ -17,7 +18,7 @@ export function useMoodRegisterViewModel() {
   const [factors, setFactors] = useState<MoodFactor[]>([]);
 
   const [reminder, setReminder] = useState<MoodReminder | null>(null);
-  const [privacy, setPrivacy] = useState<MoodPrivacy | null>(null);
+  const [privacy, setPrivacy] = useState<PrivacySettings | null>(null);
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
 
   const [loading, setLoading] = useState(true);
@@ -32,7 +33,7 @@ export function useMoodRegisterViewModel() {
       const [today, rem, priv] = await Promise.all([
         getTodayMoodLog(),
         getMoodReminder(),
-        getMoodPrivacy(),
+        getPrivacy(),
       ]);
       setReminder(rem);
       setPrivacy(priv);

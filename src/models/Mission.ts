@@ -1,7 +1,10 @@
 // Modelos del Módulo 3 (Misiones únicas y enfoque).
 // Solo definen la forma de los datos; no contienen lógica.
 
-export type MissionType = "cultura" | "fisico" | "enfoque";
+import type { PointType } from "@/models/common";
+
+// El tipo de una misión es el tipo de puntos que otorga
+export type MissionType = PointType;
 
 // Cómo se comprobó que la misión se cumplió (RDF041, RDF043)
 export type ValidationMethod = "bloqueo" | "smartwatch" | "manual";

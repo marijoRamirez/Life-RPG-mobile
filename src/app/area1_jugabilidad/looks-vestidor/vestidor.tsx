@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomNav } from "@/components/ui/BottomNav";
 import { PixelIcon } from "@/components/ui/PixelIcons";
+import { POINT_META } from "@/constants/pointTypes";
 import { theme } from "@/constants/theme";
 import { wardrobeStyles as styles } from "@/styles/looks.styles";
 import { useWardrobeViewModel } from "@/viewmodels/useWardrobeViewModel";
@@ -78,7 +79,7 @@ export default function VestidorScreen() {
 
                 <View style={styles.itemStatRow}>
                   <PixelIcon name={item.icon} size={10} color={theme.colors.textSecondary} />
-                  <Text style={styles.itemStatText}>{item.stat}</Text>
+                  <Text style={styles.itemStatText}>{POINT_META[item.stat].label}</Text>
                 </View>
 
                 <View style={[styles.badge, item.equipped && styles.badgeEquipped]}>

@@ -1,30 +1,73 @@
-// Cliente HTTP base que usan todos los servicios cuando se conecte el backend.
-// Agrega la URL del servidor, el token de sesión y convierte los errores en excepciones.
-// Mientras tanto, cada servicio trabaja con datos simulados (mock).
+import { API_TIMEOUT_MS, API_URL, DEV_USER_ID } from "@/config/env";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:5000/api/v1";
+// Cliente HTTP único de la app. Todos los servicios llaman al backend por aquí.
+// Se encarga de: URL base, identificar al usuario, tiempo límite y errores.
+// Contrato completo de la API: docs/API.md
+
+// Error de la API con su código HTTP. El mensaje ya viene listo para mostrarse.
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public status: number, // 0 = no hubo respuesta (sin red o tiempo agotado)
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
 
 let authToken: string | null = null;
 
-// Lo llama el módulo de autenticación (M00) al iniciar sesión
+// Lo llama el módulo de autenticación (M00) al iniciar o cerrar sesión
 export function setAuthToken(token: string | null) {
   authToken = token;
 }
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-export async function apiClient<T>(path: string, method: Method = "GET", body?: unknown): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-    },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const message = await res.text();
-    throw new Error(message || `Error ${res.status}`);
+async function request<T>(method: Method, path: string, body?: unknown): Promise<T> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        // Con sesión: token JWT. Sin login todavía: usuario de prueba.
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : { "x-user-id": DEV_USER_ID }),
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch {
+    throw new ApiError("No se pudo conectar con el servidor. Revisa tu conexión.", 0);
+  } finally {
+    clearTimeout(timer);
   }
-  return (res.status === 204 ? undefined : await res.json()) as T;
+
+  if (res.status === 204) return undefined as T;
+
+  const text = await res.text();
+  let data: unknown = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    // La respuesta no era JSON; se trata como error abajo si el código no es 2xx
+  }
+
+  if (!res.ok) {
+    // Formato de error del contrato: { "error": "mensaje" }
+    const message = (data as { error?: string } | null)?.error;
+    throw new ApiError(message ?? `Error ${res.status} del servidor.`, res.status);
+  }
+  return data as T;
 }
+
+export const api = {
+  get: <T>(path: string) => request<T>("GET", path),
+  post: <T>(path: string, body?: unknown) => request<T>("POST", path, body),
+  put: <T>(path: string, body?: unknown) => request<T>("PUT", path, body),
+  patch: <T>(path: string, body?: unknown) => request<T>("PATCH", path, body),
+  delete: <T = void>(path: string) => request<T>("DELETE", path),
+};

@@ -4,7 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomNav } from "@/components/ui/BottomNav";
 import { AddIcon, PixelIcon } from "@/components/ui/PixelIcons";
-import { FILTERS, POINT_META, POINT_TYPES, SHOP_COLORS as COLORS } from "@/constants/shopTypes";
+import { POINT_META, POINT_TYPES } from "@/constants/pointTypes";
+import { FILTERS, SHOP_COLORS as COLORS } from "@/constants/shopTypes";
 import type { ShopItem } from "@/models/Item";
 import { showcaseStyles as styles } from "@/styles/shop.styles";
 import { useShopShowcaseViewModel } from "@/viewmodels/useShopShowcaseViewModel";

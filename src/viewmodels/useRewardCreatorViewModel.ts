@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
 import { ICON_OPTIONS, PRICE_STEP } from "@/constants/shopTypes";
-import type { ItemIconName, PointType, SuggestedPrice } from "@/models/Item";
+import type { PointType } from "@/models/common";
+import type { ItemIconName, SuggestedPrice } from "@/models/Item";
 import { createCustomReward, getSuggestedPrice } from "@/services/shopService";
 
 // ViewModel de 4.2 Recompensa personalizada.

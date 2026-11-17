@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 
-import type { LookSlots, SavedLook, WardrobeCategory } from "@/models/Wardrobe";
-import { applySavedLook, getCurrentLook, getSavedLooks, LOOK_NAME_MAX, saveLook } from "@/services/wardrobeService";
+import { LOOK_NAME_MAX, WARDROBE_CATEGORIES } from "@/constants/wardrobeTypes";
+import type { LookSlots, SavedLook } from "@/models/Wardrobe";
+import { applySavedLook, getCurrentLook, getSavedLooks, saveLook } from "@/services/wardrobeService";
 
 // ViewModel de Guardar look (M01).
-
-const SLOT_ORDER: WardrobeCategory[] = ["Cabeza", "Cara", "Cuerpo", "Fondo"];
 
 export function useSaveLookViewModel() {
   const [lookName, setLookNameState] = useState("");
@@ -32,7 +31,7 @@ export function useSaveLookViewModel() {
   };
 
   // Filas "Cabeza / Cara / Cuerpo / Fondo" ya listas para la vista
-  const slotRows = slots ? SLOT_ORDER.map((label) => ({ label, value: slots[label] })) : [];
+  const slotRows = slots ? WARDROBE_CATEGORIES.map((label) => ({ label, value: slots[label] })) : [];
 
   // Devuelve true si se guardó, para que la vista regrese al vestidor
   const save = async () => {
@@ -49,7 +48,7 @@ export function useSaveLookViewModel() {
     }
   };
 
-  const applyLook = async (id: number) => {
+  const applyLook = async (id: string) => {
     setError(null);
     try {
       setSavedLooks(await applySavedLook(id));

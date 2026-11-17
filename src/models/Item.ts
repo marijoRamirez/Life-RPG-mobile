@@ -2,14 +2,9 @@
 // Solo definen la forma de los datos; no contienen lógica.
 
 import type { PixelIconName } from "@/components/ui/PixelIcons";
+import type { PointType, Wallet } from "@/models/common";
 
 export type ItemIconName = PixelIconName;
-
-// Tipos de puntos con los que se paga
-export type PointType = "cultura" | "fisico" | "enfoque";
-
-// Puntos actuales del usuario por tipo
-export type Wallet = Record<PointType, number>;
 
 // 4.1 Escaparate
 export interface ShopItem {
@@ -19,6 +14,12 @@ export interface ShopItem {
   price: number;
   pointType: PointType;
   isCustom?: boolean; // Recompensa creada por el usuario → badge "TUYA"
+}
+
+// Respuesta al comprar: puntos que quedan y la recompensa que entra al inventario
+export interface PurchaseResult {
+  wallet: Wallet;
+  reward: OwnedReward;
 }
 
 // 4.2 Recompensa personalizada

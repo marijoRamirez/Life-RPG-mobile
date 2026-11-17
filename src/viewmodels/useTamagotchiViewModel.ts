@@ -2,9 +2,11 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 
 import type { PixelIconName } from "@/components/ui/PixelIcons";
-import type { Attributes, Tamagotchi } from "@/models/Tamagotchi";
-import type { UserProfile } from "@/models/UserProfile";
-import { getAttributes, getTamagotchi, getUserProfile } from "@/services/tamagotchiService";
+import type { PointType } from "@/models/common";
+import type { Tamagotchi } from "@/models/Tamagotchi";
+import type { Attributes, UserProfile } from "@/models/UserProfile";
+import { getTamagotchi } from "@/services/tamagotchiService";
+import { getAttributes, getUserProfile } from "@/services/userService";
 
 // ViewModel de la Casa / HUD principal (M01).
 
@@ -41,7 +43,7 @@ export function useTamagotchiViewModel() {
   const today = new Date();
   const dateText = `${DAYS[today.getDay()]} ${today.getDate()} de ${MONTHS[today.getMonth()]}`;
 
-  const attributeRows: { key: keyof Attributes; label: string; icon: PixelIconName; value: string; progress: string }[] =
+  const attributeRows: { key: PointType; label: string; icon: PixelIconName; value: string; progress: string }[] =
     attributes
       ? [
           { key: "cultura", label: "Puntos de Cultura", icon: "book-open", value: String(attributes.cultura.value), progress: percent(attributes.cultura.progress) },
