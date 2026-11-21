@@ -3,7 +3,7 @@ import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomNav } from "@/components/ui/BottomNav";
-import { CheckIcon, ClothesIcon, FocusIcon, MoonIcon, PixelIcon, type PixelIconName } from "@/components/ui/PixelIcons";
+import { CheckIcon, ClothesIcon, FocusIcon, HeartIcon, MoonIcon, PixelIcon, type PixelIconName } from "@/components/ui/PixelIcons";
 import { homeStyles as styles } from "@/styles/home.styles";
 import { useTamagotchiViewModel } from "@/viewmodels/useTamagotchiViewModel";
 
@@ -90,24 +90,39 @@ export default function HUDPrincipalScreen() {
             style={[styles.actionButton, { backgroundColor: "#4CAF50" }]}
             onPress={() => router.push("/area1_jugabilidad/habitos/checkin")}
           >
-            <Text style={[styles.actionButtonText, { color: "#FFFFFF" }]}>
-              <CheckIcon size={16} color="#FFFFFF" /> Check-in
+            <CheckIcon size={18} color="#FFFFFF" />
+            <Text style={[styles.actionButtonText, { color: "#FFFFFF" }]} numberOfLines={1}>
+              Check-in
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: "#2A2A35" }]}
             onPress={() => router.push("/area1_jugabilidad/misiones/tablero")}
           >
-            <Text style={[styles.actionButtonText, { color: "#FFF" }]}>
-              <FocusIcon size={16} color="#FFFFFF" /> Misiones
+            <FocusIcon size={18} color="#FFFFFF" />
+            <Text style={[styles.actionButtonText, { color: "#FFF" }]} numberOfLines={1}>
+              Misiones
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: "#9C27B0" }]}
             onPress={() => router.push("/area1_jugabilidad/looks-vestidor/vestidor")}
           >
-            <Text style={[styles.actionButtonText, { color: "#FFF" }]}>
-              <ClothesIcon size={16} color="#FFFFFF" /> Vestidor
+            <ClothesIcon size={18} color="#FFFFFF" />
+            <Text style={[styles.actionButtonText, { color: "#FFF" }]} numberOfLines={1}>
+              Vestidor
+            </Text>
+          </TouchableOpacity>
+          {/* M06: acceso fijo a Ánimo (gráfica, diario y registro); la burbuja se oculta tras registrar */}
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: "#2A2A35" }]}
+            onPress={() => router.push("/area2_economia/animo/grafica")}
+            accessibilityRole="button"
+            accessibilityLabel="Ánimo"
+          >
+            <HeartIcon size={18} color="#FFFFFF" />
+            <Text style={[styles.actionButtonText, { color: "#FFF" }]} numberOfLines={1}>
+              Ánimo
             </Text>
           </TouchableOpacity>
         </View>
