@@ -188,8 +188,9 @@ export const homeStyles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginHorizontal: 4,
+    gap: 6, // Ícono arriba y texto abajo: caben 4 botones en pantallas angostas
   },
-  actionButtonText: { fontWeight: "bold", fontSize: 14 },
+  actionButtonText: { fontWeight: "bold", fontSize: 13 },
 
   // Navegación Inferior
   bottomNav: {
