@@ -11,6 +11,8 @@ import { theme } from "@/constants/theme";
 import type { MissionType } from "@/models/Mission";
 import { focusStyles as styles, shared } from "@/styles/missions.styles";
 import { useFocusSessionViewModel } from "@/viewmodels/useFocusSessionViewModel";
+import { petImage } from "@/constants/petTypes";
+import { useSession } from "@/viewmodels/SessionProvider";
 
 const HABITAT: Record<MissionType, { badge: string; speech: string }> = {
   enfoque: { badge: "Modo estudio", speech: "Shh… estoy estudiando contigo." },
@@ -20,6 +22,7 @@ const HABITAT: Record<MissionType, { badge: string; speech: string }> = {
 
 // 3.2 Modo concentración (RF011)
 export default function ModoConcentracionScreen() {
+  const session = useSession();
   const router = useRouter();
   const { missionId } = useLocalSearchParams<{ missionId: string }>();
   const vm = useFocusSessionViewModel(missionId);
@@ -100,7 +103,7 @@ export default function ModoConcentracionScreen() {
             <Text style={styles.speechText}>{habitat.speech}</Text>
           </View>
           <Image
-            source={require("@/assets/images/gato.png")}
+            source={petImage(session.account?.pet)}
             style={styles.pet}
             resizeMode="contain"
             accessibilityLabel="Tu mascota acompañándote"

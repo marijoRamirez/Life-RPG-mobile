@@ -53,6 +53,7 @@ export default function InventarioScreen() {
             <View style={styles.rewardInfo}>
               <Text style={styles.rewardName}>{r.name}</Text>
               <Text style={styles.rewardSub}>{r.subtitle}</Text>
+              {r.giftFrom && <Text style={[styles.rewardSub, { color: COLORS.amber }]}>Regalo de {r.giftFrom}</Text>}
             </View>
             <TouchableOpacity style={styles.redeemButton} onPress={() => handleRedeem(r)}>
               <Text style={styles.redeemText}>Canjear</Text>
@@ -76,6 +77,7 @@ export default function InventarioScreen() {
                 <Text style={styles.qty}>x{c.quantity}</Text>
                 <PixelIcon name={c.icon} size={32} color={COLORS.text} />
                 <Text style={styles.consumableName}>{c.name}</Text>
+                {c.giftFrom && <Text style={[styles.consumableUse, { color: COLORS.amber }]}>De {c.giftFrom}</Text>}
                 <Text style={styles.consumableUse}>Usar</Text>
               </TouchableOpacity>
             ))}
@@ -100,6 +102,14 @@ export default function InventarioScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
+        {/* RDF059: historial de canjes */}
+        <TouchableOpacity
+          style={[styles.wardrobeButton, { marginBottom: 8 }]}
+          onPress={() => router.push("/area2_economia/tienda/canjes")}
+          accessibilityRole="button"
+        >
+          <Text style={styles.wardrobeText}>Historial de canjes</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.wardrobeButton}
           onPress={() => router.push("/area1_jugabilidad/looks-vestidor/vestidor")}

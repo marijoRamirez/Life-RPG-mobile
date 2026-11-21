@@ -32,10 +32,17 @@ export interface NewRewardInput {
   consumable: boolean;
 }
 
+// Recompensa personalizada completa, para editarla (RDF055)
+export interface CustomReward extends NewRewardInput {
+  id: string;
+}
+
 export interface SuggestedPrice {
   level: number;
-  min: number;
+  min: number; // Rango sugerido para el nivel del jugador
   max: number;
+  allowedMin: number; // Rango permitido por la economía global (M14, RDF054)
+  allowedMax: number;
 }
 
 // 4.3 Inventario
@@ -43,6 +50,7 @@ export interface OwnedReward {
   id: string;
   name: string;
   icon: ItemIconName;
+  giftFrom?: string | null; // Alias del amigo que lo regaló (M08 · RDF057); null si lo compró
   subtitle: string;
 }
 
@@ -50,6 +58,7 @@ export interface Consumable {
   id: string;
   name: string;
   icon: ItemIconName;
+  giftFrom?: string | null; // Alias del amigo que lo regaló (M08 · RDF057); null si lo compró
   quantity: number;
 }
 
@@ -57,6 +66,7 @@ export interface ClothingItem {
   id: string;
   name: string;
   icon: ItemIconName;
+  giftFrom?: string | null; // Alias del amigo que lo regaló (M08 · RDF057); null si lo compró
   equipped: boolean;
 }
 
@@ -64,4 +74,13 @@ export interface Inventory {
   rewards: OwnedReward[];
   consumables: Consumable[];
   clothing: ClothingItem[];
+}
+
+// Historial de canjes (RDF059): recompensas y consumibles ya usados
+export interface RedemptionEntry {
+  id: string;
+  name: string;
+  icon: ItemIconName;
+  kind: "recompensa" | "consumible";
+  redeemedAt: string; // ISO 8601
 }

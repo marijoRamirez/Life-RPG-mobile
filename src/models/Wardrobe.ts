@@ -13,6 +13,7 @@ export interface WardrobeItem {
   icon: PixelIconName;
   status: string; // "Equipado", "Tuyo", "120 pts", "Logro", "LV 18"…
   equipped: boolean;
+  owned: boolean; // false = se compra en la tienda, se gana con un logro o se desbloquea por nivel
   category: WardrobeCategory;
 }
 

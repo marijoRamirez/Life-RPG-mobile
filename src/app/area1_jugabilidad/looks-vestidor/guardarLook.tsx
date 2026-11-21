@@ -6,9 +6,12 @@ import { ClothesIcon, PixelIcon } from "@/components/ui/PixelIcons";
 import { theme } from "@/constants/theme";
 import { saveLookStyles as styles } from "@/styles/looks.styles";
 import { useSaveLookViewModel } from "@/viewmodels/useSaveLookViewModel";
+import { petImage } from "@/constants/petTypes";
+import { useSession } from "@/viewmodels/SessionProvider";
 
 // Guardar look (M01)
 export default function GuardarLook() {
+  const session = useSession();
   const router = useRouter();
   const vm = useSaveLookViewModel();
 
@@ -37,7 +40,7 @@ export default function GuardarLook() {
 
         <View style={styles.lookCard}>
           <View style={styles.lookImageContainer}>
-            <Image source={require("@/assets/images/gato.png")} style={styles.mascotaImage} resizeMode="contain" />
+            <Image source={petImage(session.account?.pet)} style={styles.mascotaImage} resizeMode="contain" />
           </View>
 
           {/* Lo que lleva puesto en cada parte (viene del servicio) */}
