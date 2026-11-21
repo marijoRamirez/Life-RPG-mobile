@@ -17,7 +17,7 @@ export type ApiModule = "usuarios" | "tamagotchi" | "vestidor" | "misiones" | "t
 
 const connected = (process.env.EXPO_PUBLIC_API_MODULES ?? "")
   .split(",")
-  .map((m) => m.trim().toLowerCase())
+  .map((m: string) => m.trim().toLowerCase())
   .filter(Boolean);
 
 // true si el módulo ya está conectado al backend ("todos" conecta todo)
