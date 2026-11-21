@@ -95,6 +95,17 @@ export default function EscaparateScreen() {
                       <Text style={styles.badgeText}>TUYA</Text>
                     </View>
                   )}
+                  {/* RDF055 y RDF056: editar o eliminar una recompensa propia */}
+                  {item.isCustom && (
+                    <TouchableOpacity
+                      style={{ position: "absolute", left: 4, top: 4, padding: 6 }}
+                      onPress={() => router.push({ pathname: "/area2_economia/tienda/detalle", params: { id: item.id } })}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Editar ${item.name}`}
+                    >
+                      <PixelIcon name="edit" size={14} color={COLORS.text} />
+                    </TouchableOpacity>
+                  )}
                 </View>
                 <Text style={styles.itemName} numberOfLines={1}>
                   {item.name}

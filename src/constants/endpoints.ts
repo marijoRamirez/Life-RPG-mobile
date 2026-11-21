@@ -9,6 +9,8 @@ export const ENDPOINTS = {
     puntos: "/usuarios/me/puntos",
     atributos: "/usuarios/me/atributos",
     privacidad: "/usuarios/me/privacidad",
+    cuenta: "/usuarios/me/cuenta", // M00 · cuenta del juego (crear y consultar)
+    mascota: "/usuarios/me/mascota", // M00 · animal elegido en la Bienvenida
   },
 
   // M01 · Tamagotchi
@@ -22,6 +24,17 @@ export const ENDPOINTS = {
     lookActual: "/vestidor/look-actual",
     looks: "/vestidor/looks",
     usarLook: (id: string) => `/vestidor/looks/${id}/usar`,
+    articulo: (id: string) => `/vestidor/articulos/${id}`,
+  },
+
+  // M02 · Hábitos diarios
+  habitos: {
+    hoy: "/habitos/hoy",
+    lista: "/habitos",
+    uno: (id: string) => `/habitos/${id}`,
+    checkin: (id: string) => `/habitos/${id}/checkin`,
+    rachas: (mes: string, habitoId: string | null) =>
+      `/habitos/rachas?mes=${mes}${habitoId ? `&habito=${habitoId}` : ""}`,
   },
 
   // M03 · Misiones únicas y enfoque
@@ -43,10 +56,20 @@ export const ENDPOINTS = {
     compras: "/tienda/compras",
     precioSugerido: "/tienda/precio-sugerido",
     recompensas: "/tienda/recompensas",
+    recompensa: (id: string) => `/tienda/recompensas/${id}`,
     inventario: "/inventario",
+    canjes: "/inventario/canjes",
     canjear: (id: string) => `/inventario/recompensas/${id}/canjear`,
     usarConsumible: (id: string) => `/inventario/consumibles/${id}/usar`,
     ropa: (id: string) => `/inventario/ropa/${id}`,
+  },
+
+  // M05 · Logros y progresión
+  logros: {
+    lista: "/logros",
+    uno: (id: string) => `/logros/${id}`,
+    reclamar: (id: string) => `/logros/${id}/reclamar`,
+    comparativa: "/progreso/comparativa",
   },
 
   // M06 · Estado de ánimo

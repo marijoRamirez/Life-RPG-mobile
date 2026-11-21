@@ -49,7 +49,7 @@ EXPO_PUBLIC_API_URL=http://192.168.0.10:3000/api/v1
 EXPO_PUBLIC_API_MODULES=usuarios,animo
 ```
 
-Los módulos de la lista usan el backend; los demás siguen con datos simulados. Claves: `usuarios`, `tamagotchi`, `vestidor`, `misiones`, `tienda`, `animo` (o `todos`). Vacío = toda la app simulada. Después de cambiar el `.env`, reinicia con `npx expo start -c`.
+Los módulos de la lista usan el backend; los demás siguen con datos simulados. Claves: `usuarios`, `tamagotchi`, `vestidor`, `habitos`, `misiones`, `tienda`, `logros`, `animo` (o `todos`). Vacío = toda la app simulada. Después de cambiar el `.env`, reinicia con `npx expo start -c`.
 
 ### 3. Reglas del contrato
 
@@ -61,9 +61,25 @@ Los módulos de la lista usan el backend; los demás siguen con datos simulados.
 | Fechas | ISO 8601 para momentos; `AAAA-MM-DD` para días; `HH:mm` para horas. |
 | Tipos de puntos | `"cultura"`, `"fisico"`, `"enfoque"` (tipo `PointType` de `models/common.ts`). El texto visible sale de `constants/pointTypes.ts`. |
 | Errores | El backend responde `{ "error": "mensaje en español" }` con su código HTTP. `apiClient` lo convierte en `ApiError` y el ViewModel muestra `error.message`. |
-| Usuario | Sin login todavía: `apiClient` manda `x-user-id` con el usuario de prueba. Con el M00 mandará el token JWT (`setAuthToken`). |
+| Usuario | Con Firebase (`EXPO_PUBLIC_AUTH_MODE=firebase`), `apiClient` manda `Authorization: Bearer <token de Firebase>`. En los modos de prueba manda `x-user-id` con el usuario de prueba. Ver "Inicio de sesión (M00)". |
 | Datos compartidos | Lo que usan varios módulos tiene **una sola fuente**. Los puntos del usuario se piden con `getPoints()` de `userService`, no se copian en cada módulo. |
 | Reglas de negocio | Las valida el servidor. El móvil no recalcula XP, saldos ni recompensas. |
+
+### 4. Inicio de sesión (M00)
+
+La app tiene tres modos, con `EXPO_PUBLIC_AUTH_MODE` en el `.env`:
+
+| Modo | Qué pasa | Para qué |
+| :-- | :-- | :-- |
+| `mock` (por defecto) | La sesión ya está iniciada con el usuario de prueba. La app abre en la Casa. | Programar cualquier módulo sin pensar en el login. |
+| `mock-login` | Datos simulados, pero empieza **sin sesión**. Cuenta de prueba: `yess@liferpg.mx` / `Prueba123`; "Continuar con Google" entra como Valeria (cuenta nueva). | Probar Login, Crear cuenta y Bienvenida sin Firebase. |
+| `firebase` | Firebase Authentication real (correo y contraseña, y Google en la versión web). Necesita las variables `EXPO_PUBLIC_FIREBASE_*` (pídelas al equipo). | Probar el login real. |
+
+Flujo (ruta B): **Login** (Google o correo) → **Crear cuenta** (nombre y apellido desde Google y editables, contraseña, edad, género y metas) → **Bienvenido a Life-RPG** (elige tu animal, una sola vez por cuenta) → **Casa**. La sesión queda guardada en el teléfono: al abrir la app otra vez entra directo, como Pokémon GO.
+
+- La sesión vive en `src/viewmodels/SessionProvider.tsx`. Las pantallas la leen con `useSession()` (usuario, cuenta y `signOut`). `app/_layout.tsx` decide a qué pantalla va cada quien; no hace falta proteger cada ruta a mano.
+- Firebase solo se usa dentro de `src/services/firebase/`. El resto llama a `authService`, que elige Firebase o el modo de prueba.
+- Google en el celular necesita una *development build* (no funciona en Expo Go). En Expo Go entra con correo y contraseña; en la versión web (`w`) Google sí funciona.
 
 ---
 
@@ -76,16 +92,20 @@ docs/
 └─ API.md                    Contrato con el backend (rutas, datos y errores)
 src/
 ├─ app/                      VIEW · pantallas (Expo Router: la ruta del archivo es la URL)
-│  ├─ _layout.tsx            Navegador raíz y carga de la fuente RetroTech
+│  ├─ _layout.tsx            Navegador raíz, fuente RetroTech y a qué pantalla va cada quien según su sesión
 │  ├─ index.tsx              Casa / HUD principal (M01)
-│  ├─ area1_jugabilidad/     habitos/ (M02) · looks-vestidor/ y perfil/ (M01) · misiones/ (M03)
+│  ├─ acceso/                M00 · login, crearCuenta, recuperar, bienvenida
+│  ├─ area1_jugabilidad/     habitos/ (M02) · looks-vestidor/ y perfil/ (M01, + ajustes) · misiones/ (M03)
 │  └─ area2_economia/        tienda/ (M04) · logros/ (M05) · animo/ (M06)
 ├─ components/               VIEW · piezas visuales reutilizables
-│  ├─ ui/                    Compartidas: BottomNav, PixelIcons, ComingSoon
-│  └─ misiones/ tienda/ animo/   Propias de cada módulo
-├─ viewmodels/               VIEWMODEL · un hook por pantalla (useXxxViewModel.ts)
+│  ├─ ui/                    Compartidas: BottomNav, PixelIcons, ScreenHeader, AchievementToast, ComingSoon
+│  └─ acceso/ misiones/ tienda/ logros/ animo/   Propias de cada módulo
+├─ viewmodels/               VIEWMODEL · un hook por pantalla (useXxxViewModel.ts) + SessionProvider (sesión)
 ├─ services/                 SERVICE · un archivo por módulo (xxxService.ts)
-│  ├─ apiClient.ts           Cliente HTTP único: URL, usuario, tiempo límite y errores
+│  ├─ apiClient.ts           Cliente HTTP único: URL, usuario o token, tiempo límite y errores
+│  ├─ authService.ts         Inicio de sesión: Firebase o modo de prueba
+│  ├─ firebase/              Lo único que habla con Firebase
+│  ├─ notificationService.*  Recordatorio diario de ánimo (notificación local, solo celular)
 │  └─ mocks/                 Datos simulados (xxxMock.ts) y mockUtils.ts
 ├─ models/                   MODEL · tipos por módulo + common.ts (tipos compartidos)
 ├─ constants/                endpoints.ts (rutas de la API), theme.ts, pointTypes.ts y xxxTypes.ts por módulo
@@ -101,12 +121,15 @@ src/
 | Módulo | View (`app/`) | ViewModel | Service (y su mock) | Model | Clave en `.env` |
 | :-- | :-- | :-- | :-- | :-- | :-- |
 | Usuario actual (compartido) | — | — | `userService` | `UserProfile`, `common` | `usuarios` |
+| M00 Acceso | `acceso/` | `SessionProvider`, `useLogin…`, `useCreateAccount…`, `useRecoverPassword…`, `useChoosePet…` | `authService`, `userService` | `Account` | `usuarios` |
 | M01 Casa | `index.tsx` | `useTamagotchiViewModel` | `tamagotchiService`, `userService` | `Tamagotchi` | `tamagotchi` |
 | M01 Vestidor | `looks-vestidor/` | `useWardrobeViewModel`, `useSaveLookViewModel` | `wardrobeService` | `Wardrobe` | `vestidor` |
+| M01 Perfil y Ajustes | `perfil/` | `useProfile…`, `useChangePassword…`, `useSettings…` | `userService`, `authService`, `moodService` | `Account`, `UserProfile` | `usuarios` |
+| M02 Hábitos | `habitos/` (+ `enfoque` para hábitos con tiempo de enfoque) | `useHabitCheckin…`, `useHabitEditor…`, `useStreakCalendar…`, `useHabitFocus…` | `habitService` | `Quest` | `habitos` |
 | M03 Misiones | `misiones/` | `useMissionBoard…`, `useFocusSession…`, `useMissionHistory…` | `missionService` | `Mission` | `misiones` |
-| M04 Tienda | `tienda/` | `useShopShowcase…`, `useRewardCreator…`, `useInventory…` | `shopService` | `Item` | `tienda` |
+| M04 Tienda | `tienda/` (+ `canjes`) | `useShopShowcase…`, `useRewardCreator…`, `useInventory…`, `useRedemptionHistory…` | `shopService` | `Item` | `tienda` |
+| M05 Logros | `logros/` | `useAchievements…`, `useAchievementDetail…`, `useMonthlyComparison…` | `achievementService` | `Achievement` | `logros` |
 | M06 Ánimo | `animo/` | `useMoodRegister…`, `useMoodChart…`, `useMoodJournal…` | `moodService` | `MoodLog` | `animo` |
-| M02 Hábitos · M05 Logros · Perfil | Pantallas "En construcción" (`ComingSoon`) | — | — | `Quest` (pendiente) | — |
 
 ### Cómo agregar o terminar una pantalla
 
@@ -122,7 +145,9 @@ src/
 ### Carpetas Compartidas
 
 - **`assets/`**: `images/` (mascotas) y `fonts/` (tipografía RetroTech).
-- **`src/components/ui/`**: `BottomNav`, `PixelIcons` (todos los íconos) y `ComingSoon` (pantalla temporal para rutas pendientes).
+- **`src/components/ui/`**: `BottomNav`, `PixelIcons` (todos los íconos), `PetAvatar` (mascota animada con su ropa y su estado según el HP), `ScreenHeader` (regresar + título), `AchievementToast` (aviso de logro) y `ComingSoon` (pantalla temporal para rutas futuras).
+- **Dirección del servidor:** `src/services/serverConfig.ts`. Sale del `.env`, pero el jugador la puede cambiar en Ajustes › Servidor (nube o IP de la red local).
+- **`src/styles/ui.styles.ts`**: piezas visuales comunes (tarjetas, botones, chips, etiquetas) para pantallas nuevas.
 
 ---
 
@@ -166,7 +191,10 @@ cp .env.example .env
 pnpm install
 
 # 4. Iniciar el servidor de desarrollo de Expo (limpiando caché)
-pnpm dlx expo start -c
+pnpm exec expo start --clear
 ```
+
+> **Windows con npm 12:** `npx expo start` falla con `Cannot find module ...expo\bin\cli`. Usa
+> `npx pnpm@9.15.0 install` y luego `npx pnpm@9.15.0 exec expo start --clear`.
 
 Una vez que el servidor esté corriendo, escanea el código QR con la app **Expo Go** en tu celular físico, o presiona `a` para abrir en el emulador de Android / `i` para el simulador de iOS.

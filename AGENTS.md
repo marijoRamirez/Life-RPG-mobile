@@ -11,6 +11,10 @@ Lee `README.md` (estructura y estándar) y `docs/API.md` (contrato con el backen
 - **Errores:** el backend responde `{ "error": "mensaje" }`; llega como `ApiError`. En los ViewModels usa `try / catch / finally` y muestra `error.message`.
 - **Reglas de negocio en el servidor.** El móvil no calcula XP, saldos ni recompensas.
 - **Código y comentarios** en el estilo del repo: nombres en inglés, comentarios y textos en español, con el RF/RDF cuando aplique.
+- **Sesión (M00):** léela con `useSession()` de `src/viewmodels/SessionProvider.tsx`. No llames a Firebase fuera de `src/services/firebase/`; usa `authService`. Para programar sin login deja `EXPO_PUBLIC_AUTH_MODE=mock` (por defecto). No protejas rutas a mano: `app/_layout.tsx` ya manda a cada quien a su pantalla.
+- **Mascota del jugador:** usa `<PetAvatar>` (animada, con estado por HP) o `petImage(session.account?.pet)` de `src/constants/petTypes.ts`; no escribas `require(".../gato.png")` en pantallas.
+- **URL del backend:** el cliente la toma de `getApiUrl()` (`src/services/serverConfig.ts`), no directo del `.env`.
+- **Pantallas nuevas:** usa `ScreenHeader` y las piezas de `src/styles/ui.styles.ts` para que todo se vea igual.
 - Gestor de paquetes: **pnpm** (no generes `package-lock.json`). No agregues dependencias sin acordarlo con el equipo.
 - Trabaja en una rama por módulo (`feat/mXX-nombre`) y abre Pull Request; no hagas push directo a `main`.
 

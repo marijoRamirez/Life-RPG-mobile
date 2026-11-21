@@ -13,7 +13,8 @@ Si algo tiene que cambiar, **se cambia primero aquí** y después en los dos lad
 
 | Tema | Regla |
 | :-- | :-- |
-| **URL base** | `http://<host>:3000/api/v1` (variable `EXPO_PUBLIC_API_URL` del móvil). |
+| **URL base** | `http://<host>:3000/api/v1` (variable `EXPO_PUBLIC_API_URL` del móvil; el jugador puede cambiarla en Ajustes › Servidor, RDF011). |
+| **Estado** | `GET /estado` responde `{ "status": "ok" }` sin usuario. Ajustes › Servidor lo usa para probar la conexión. |
 | **Rutas** | Recursos en español, minúsculas y con guiones: `/vestidor/look-actual`. Parámetros como `:id`. |
 | **Formato** | Siempre JSON (`Content-Type: application/json`), en la petición y en la respuesta. |
 | **Nombres de campos** | En inglés y `camelCase`, idénticos a los modelos: `createdAt`, `pointType`, `xpAwarded`. |
@@ -26,8 +27,11 @@ Si algo tiene que cambiar, **se cambia primero aquí** y después en los dos lad
 
 ### Quién es el usuario
 
-- **Mientras no exista el inicio de sesión (M00):** el móvil envía el encabezado `x-user-id: u-1` (usuario de prueba, variable `EXPO_PUBLIC_DEV_USER_ID`).
-- **Cuando exista el M00:** envía `Authorization: Bearer <token JWT>` y deja de mandar `x-user-id`.
+- **Con inicio de sesión (M00, modo `firebase`):** el móvil inicia sesión con **Firebase Authentication** y envía
+  `Authorization: Bearer <ID token de Firebase>` en cada petición (Firebase lo renueva solo cada hora).
+  El backend lo valida con `firebase-admin` (`verifyIdToken`) y usa el `uid` como id del usuario.
+- **En los modos de prueba (`mock` y `mock-login`):** no hay token y el móvil envía `x-user-id: u-1`
+  (variable `EXPO_PUBLIC_DEV_USER_ID`), igual que antes. El backend debe aceptar los dos mientras se integra el M00.
 - El backend toma al usuario **solo** de ahí. Ninguna ruta recibe el id del usuario en la URL ni en el cuerpo; "el usuario actual" es `/usuarios/me`.
 - Cada usuario solo puede ver y modificar sus propios datos.
 
@@ -67,6 +71,23 @@ Datos compartidos por la Casa, la Tienda, el Vestidor y el Ánimo. Modelos: `Use
 | `GET /usuarios/me/puntos` | — | `Wallet` | Única fuente de los puntos: `{ "cultura": 340, "fisico": 210, "enfoque": 480 }`. |
 | `GET /usuarios/me/atributos` | — | `Attributes` | Puntos con su avance de 0 a 1 para las barras de la Casa. |
 | `GET /usuarios/me/privacidad` | — | `PrivacySettings` | RDF071. |
+| `PUT /usuarios/me/privacidad` | `{ "visibleToViewers": false }` | `PrivacySettings` | Ajustes › Privacidad. |
+
+### M00 · Cuenta del jugador · módulo móvil `usuarios`
+
+La **contraseña y el correo los maneja Firebase**, no el backend. El backend guarda los datos del juego
+de cada `uid`. Modelo: `Account.ts`.
+
+| Método y ruta | Cuerpo | Responde | Notas |
+| :-- | :-- | :-- | :-- |
+| `GET /usuarios/me/cuenta` | — | `Account` | **`404` si aún no llena "Crear cuenta"**: el móvil lo lleva a esa pantalla. |
+| `POST /usuarios/me/cuenta` | `NewAccountInput` | `Account` (`201`) | RDF001. `firstName` y `lastName` obligatorios (máx. 40); `age` entero de 1 a 120; `gender`: `"mujer"`, `"hombre"`, `"no_binario"` o `"prefiero_no_decir"`; `goals`: lista de `"lectura"`, `"ejercicio"`, `"enfoque"`, `"sueno"`, `"animo"`; `customGoal`: texto (máx. 60) o `null`. Al menos una meta o `customGoal`. Crea la cuenta con `pet: null`. |
+| `PUT /usuarios/me/cuenta` | `AccountChanges` | `Account` | Mi perfil (RDF024, RDF026). Mismos campos, todos opcionales, más `photoUrl` y `petColor` (`"verde"`, `"morado"`, `"rojo"`, `"azul"` o `"naranja"`; colorea el aura y el hábitat de la mascota). |
+| `PUT /usuarios/me/mascota` | `{ "pet": "dragon" }` | `Account` | "Bienvenido a Life-RPG". `pet`: `"gato"`, `"perro"`, `"dragon"`, `"hamster"` o `"leon"`. **Solo una vez por cuenta**: `400` si ya tiene mascota. Crea su Tamagotchi. |
+
+Flujo del móvil (ruta B): Login (Google o correo) → si `GET /usuarios/me/cuenta` da `404` → Crear cuenta →
+si `pet` es `null` → Bienvenida (elegir animal) → Casa. La sesión queda guardada en el teléfono: al abrir la app
+otra vez entra directo. En otro celular, al iniciar sesión ya tiene su cuenta y su animal.
 
 ### M01 · Tamagotchi · módulo móvil `tamagotchi`
 
@@ -87,6 +108,30 @@ Modelo: `Wardrobe.ts`.
 | `GET /vestidor/looks` | — | `SavedLook[]` | |
 | `POST /vestidor/looks` | `{ "name": "Modo examen" }` | `SavedLook[]` | Guarda el look actual y lo deja en uso. Nombre obligatorio, máx. 24 caracteres. Si el nombre ya existe, lo actualiza. |
 | `PATCH /vestidor/looks/:id/usar` | — | `SavedLook[]` | Deja ese look como el que está en uso. |
+| `PATCH /vestidor/articulos/:id` | `{ "equipped": true }` | `WardrobeItem[]` | RDF021 y RDF022. Al equipar, quita lo que había en esa parte. `400` si `owned` es `false`. |
+
+`WardrobeItem.owned`: `false` si la prenda aún no es del jugador (se compra, se gana con un logro o se desbloquea por nivel; `status` dice cuál).
+
+### M02 · Hábitos diarios · módulo móvil `habitos`
+
+Modelo: `Quest.ts`. Recompensa por dificultad: `facil` 10, `media` 20, `dificil` 40 (XP y puntos del tipo del hábito).
+Penalizaciones fijas: `"hp"` (−10 HP), `"racha"` (reiniciar racha), `"puntos"` (−25 pts). `days`: 1 lunes … 7 domingo.
+
+| Método y ruta | Cuerpo | Responde | Notas |
+| :-- | :-- | :-- | :-- |
+| `GET /habitos/hoy` | — | `TodayHabit[]` | RDF027. Los activos programados para hoy, con `done`. |
+| `GET /habitos` | — | `Habit[]` | Todos, incluidos los pausados (`active: false`). |
+| `GET /habitos/:id` | — | `Habit` | |
+| `POST /habitos` | `NewHabitInput` | `Habit` (`201`) | RDF031. Nombre obligatorio (máx. 40), al menos un día. `focusMinutes`: `null` o de 10 a 120. |
+| `PUT /habitos/:id` | `NewHabitInput` | `Habit` | RDF034. Aplica desde mañana; no cambia el historial. |
+| `PATCH /habitos/:id` | `{ "active": false }` | `Habit` | RDF035. Pausar o reactivar; conserva historial y rachas. |
+| `POST /habitos/:id/checkin` | — | `CheckInResult` | RDF028. Una vez al día (`400` si ya estaba). Suma puntos y XP. `unlockedAchievements`: nombres de logros que se desbloquearon. Si el hábito tiene `focusMinutes`, el móvil lo llama solo al terminar su Modo concentración. |
+| `DELETE /habitos/:id/checkin` | — | `CheckInResult` | RDF029. Solo el mismo día; resta la recompensa (`xpChange` y `pointsChange` negativos). |
+| `GET /habitos/rachas?mes=AAAA-MM&habito=:id` | — | `StreakCalendar` | RDF036 a RDF038. Sin `habito` = todos. Estados por día: `completo`, `parcial`, `fallido`, `sin_habitos`, `futuro`. |
+
+**Racha global:** días seguidos con al menos un hábito cumplido; un día sin ninguno la rompe. **Por hábito:**
+días seguidos cumpliéndolo (los días que no le tocaba no la rompen). **Cierre diario (RDF030):** a las 23:59
+el servidor marca los no cumplidos y aplica su penalización.
 
 ### M03 · Misiones únicas y enfoque · módulo móvil `misiones`
 
@@ -112,9 +157,13 @@ Modelo: `Item.ts`. Los puntos se consultan en `GET /usuarios/me/puntos`.
 | :-- | :-- | :-- | :-- |
 | `GET /tienda/articulos` | — | `ShopItem[]` | |
 | `POST /tienda/compras` | `{ "itemId": "s1" }` | `PurchaseResult` | Valida que alcancen los puntos del tipo del artículo y los descuenta. `400` si no alcanzan. |
-| `GET /tienda/precio-sugerido` | — | `SuggestedPrice` | Depende del nivel y de la economía global (M14). |
+| `GET /tienda/precio-sugerido` | — | `SuggestedPrice` | `min`/`max`: sugerido para el nivel. `allowedMin`/`allowedMax`: rango permitido por la economía global (M14, RDF054); fuera de él, crear o editar responde `400`. |
 | `POST /tienda/recompensas` | `NewRewardInput` | `ShopItem` | Nombre obligatorio y precio mayor a 0 (dentro del rango del M14). Queda con `isCustom: true`. |
-| `GET /inventario` | — | `Inventory` | |
+| `GET /tienda/recompensas/:id` | — | `CustomReward` | Datos completos de una recompensa propia, para editarla. |
+| `PUT /tienda/recompensas/:id` | `NewRewardInput` | `ShopItem` | RDF055. Solo recompensas propias. |
+| `DELETE /tienda/recompensas/:id` | — | `204` | RDF056. Solo recompensas propias. |
+| `GET /inventario/canjes` | — | `RedemptionEntry[]` | RDF059. Recompensas y consumibles usados, del más reciente al más antiguo. |
+| `GET /inventario` | — | `Inventory` | RDF057. Recompensas, consumibles y ropa; lo que llegó como regalo de un amigo (M08) trae `giftFrom` con su alias. |
 | `POST /inventario/recompensas/:id/canjear` | — | `204` | |
 | `POST /inventario/consumibles/:id/usar` | — | `Consumable[]` | Resta 1; devuelve los consumibles que quedan. |
 | `PATCH /inventario/ropa/:id` | — | `ClothingItem[]` | Pone o quita la prenda; devuelve toda la ropa. |
@@ -135,13 +184,20 @@ Modelo: `MoodLog.ts`. La privacidad se consulta en `GET /usuarios/me/privacidad`
 | `PUT /animo/diario/:id` | `JournalEntryInput` | `JournalEntry` | RDF076 y RDF078. |
 | `DELETE /animo/diario/:id` | — | `204` | RDF078. |
 
-### Pendientes (su responsable agrega aquí sus rutas antes de programar)
+### M05 · Logros y progresión · módulo móvil `logros`
 
-| Módulo | Estado |
-| :-- | :-- |
-| M00 · Autenticación | Sin definir. Reemplazará `x-user-id` por el token JWT. |
-| M02 · Hábitos | Pantallas "En construcción". Modelo `Quest.ts` vacío. |
-| M05 · Logros | Pantallas "En construcción". |
+Modelo: `Achievement.ts`. `rarity`: `"comun"`, `"raro"`, `"epico"` o `"legendario"`. `area` decide a qué pantalla lleva
+el botón de la ficha: `"habitos"`, `"misiones"`, `"enfoque"`, `"tienda"` o `"animo"`.
+
+| Método y ruta | Cuerpo | Responde | Notas |
+| :-- | :-- | :-- | :-- |
+| `GET /logros` | — | `Achievement[]` | RDF060. Desbloqueados y bloqueados (`unlockedAt: null`) con `current` / `target`. |
+| `GET /logros/:id` | — | `Achievement` | RDF063. |
+| `POST /logros/:id/reclamar` | — | `ClaimResult` | RDF064. Una sola vez (`400` si ya se reclamó o si está bloqueado). Suma los puntos de `reward`. |
+| `GET /progreso/comparativa` | — | `MonthlyComparison` | RDF065 a RDF067. Días 1 a hoy de este mes contra los mismos días del anterior. `dailyXp`: XP acumulada por día. |
+
+**evaluarLogros (RDF061)** corre en el servidor tras cada check-in, misión, racha o compra. Lo que se desbloquee
+en una acción se devuelve en su respuesta (p. ej. `unlockedAchievements` del check-in) y el móvil muestra el aviso.
 
 ---
 
@@ -152,6 +208,7 @@ Modelo: `MoodLog.ts`. La privacidad se consulta en `GET /usuarios/me/privacidad`
    ```
    EXPO_PUBLIC_API_URL=http://192.168.0.10:3000/api/v1
    EXPO_PUBLIC_API_MODULES=usuarios,animo
+   # Claves: usuarios, tamagotchi, vestidor, habitos, misiones, tienda, logros, animo (o todos)
    ```
 3. Se reinicia Expo (`npx expo start -c`). Ese módulo ya usa la API; los demás siguen con datos simulados.
 

@@ -3,9 +3,11 @@ import { ENDPOINTS } from "@/constants/endpoints";
 import type {
   ClothingItem,
   Consumable,
+  CustomReward,
   Inventory,
   NewRewardInput,
   PurchaseResult,
+  RedemptionEntry,
   ShopItem,
   SuggestedPrice,
 } from "@/models/Item";
@@ -47,3 +49,19 @@ export const consumeItem = (id: string): Promise<Consumable[]> =>
 // PATCH /inventario/ropa/:id — pone o quita la prenda; devuelve toda la ropa
 export const toggleClothing = (id: string): Promise<ClothingItem[]> =>
   real ? api.patch(ENDPOINTS.tienda.ropa(id)) : mock.toggleClothing(id);
+
+// GET /tienda/recompensas/:id — datos completos de una recompensa propia, para editarla
+export const getCustomReward = (id: string): Promise<CustomReward> =>
+  real ? api.get(ENDPOINTS.tienda.recompensa(id)) : mock.getCustomReward(id);
+
+// PUT /tienda/recompensas/:id — RDF055 · actualizarRecompensaPersonalizada
+export const updateCustomReward = (id: string, input: NewRewardInput): Promise<ShopItem> =>
+  real ? api.put(ENDPOINTS.tienda.recompensa(id), input) : mock.updateCustomReward(id, input);
+
+// DELETE /tienda/recompensas/:id — RDF056 · eliminarRecompensaPersonalizada
+export const deleteCustomReward = (id: string): Promise<void> =>
+  real ? api.delete(ENDPOINTS.tienda.recompensa(id)) : mock.deleteCustomReward(id);
+
+// GET /inventario/canjes — RDF059 · consultarHistorialCanjes
+export const getRedemptions = (): Promise<RedemptionEntry[]> =>
+  real ? api.get(ENDPOINTS.tienda.canjes) : mock.getRedemptions();

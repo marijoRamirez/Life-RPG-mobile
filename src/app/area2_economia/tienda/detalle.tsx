@@ -1,4 +1,4 @@
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -21,12 +21,17 @@ import { useRewardCreatorViewModel } from "@/viewmodels/useRewardCreatorViewMode
 // 4.2 Recompensa personalizada
 export default function DetalleCompraScreen() {
   const router = useRouter();
-  const vm = useRewardCreatorViewModel();
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const vm = useRewardCreatorViewModel(id);
   const meta = POINT_META[vm.pointType];
 
   const handleSave = async () => {
     const savedName = await vm.save();
     if (!savedName) return;
+    if (vm.editing) {
+      router.back(); // RDF055: al editar regresa directo al escaparate
+      return;
+    }
     Alert.alert("Recompensa creada", `"${savedName}" ya está en tu escaparate.`, [
       { text: "Listo", onPress: () => router.back() },
     ]);
@@ -42,7 +47,7 @@ export default function DetalleCompraScreen() {
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
               <ChevronLeftIcon size={16} color={COLORS.text} />
             </TouchableOpacity>
-            <Text style={styles.title}>Recompensa personalizada</Text>
+            <Text style={styles.title}>{vm.editing ? "Editar recompensa" : "Recompensa personalizada"}</Text>
           </View>
 
           {/* Vista previa */}
@@ -158,7 +163,23 @@ export default function DetalleCompraScreen() {
             />
           </View>
 
+          {vm.outOfRange && <Text style={[styles.hint, { color: "#FF6B5E" }]}>{vm.outOfRange}</Text>}
           {vm.error && <Text style={styles.hint}>{vm.error}</Text>}
+
+          {/* RDF056: eliminar una recompensa propia (dos toques) */}
+          {vm.editing && (
+            <TouchableOpacity
+              style={{ alignSelf: "center", padding: 12 }}
+              onPress={async () => {
+                if (await vm.remove()) router.back();
+              }}
+              accessibilityRole="button"
+            >
+              <Text style={{ color: "#FF6B5E", fontWeight: "bold" }}>
+                {vm.confirmDelete ? "Toca otra vez para eliminarla" : "Eliminar recompensa"}
+              </Text>
+            </TouchableOpacity>
+          )}
         </ScrollView>
 
         <View style={styles.footer}>
@@ -167,7 +188,7 @@ export default function DetalleCompraScreen() {
             disabled={!vm.canSave}
             onPress={handleSave}
           >
-            <Text style={styles.saveText}>Guardar</Text>
+            <Text style={styles.saveText}>{vm.editing ? "Guardar cambios" : "Guardar"}</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

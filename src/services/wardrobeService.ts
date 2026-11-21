@@ -26,3 +26,7 @@ export const saveLook = (name: string): Promise<SavedLook[]> =>
 // PATCH /vestidor/looks/:id/usar
 export const applySavedLook = (id: string): Promise<SavedLook[]> =>
   real ? api.patch(ENDPOINTS.vestidor.usarLook(id)) : mock.applySavedLook(id);
+
+// PATCH /vestidor/articulos/:id — RDF021 equipar / RDF022 desequipar; devuelve todo el vestuario
+export const setEquipped = (id: string, equipped: boolean): Promise<WardrobeItem[]> =>
+  real ? api.patch(ENDPOINTS.vestidor.articulo(id), { equipped }) : mock.setEquipped(id, equipped);

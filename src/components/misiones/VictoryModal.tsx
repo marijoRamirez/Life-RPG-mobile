@@ -6,6 +6,8 @@ import { MISSION_COLORS, MISSION_TYPE_META } from "@/constants/missionTypes";
 import { theme } from "@/constants/theme";
 import type { SessionOutcome } from "@/models/Mission";
 import { shared } from "@/styles/missions.styles";
+import { petImage } from "@/constants/petTypes";
+import { useSession } from "@/viewmodels/SessionProvider";
 
 type Props = {
   outcome: SessionOutcome | undefined;
@@ -29,6 +31,7 @@ export function VictoryModal({
   onShowHistory,
   onGoHome,
 }: Props) {
+  const session = useSession();
   const insets = useSafeAreaInsets();
   if (!outcome) return null;
   const { mission, activity, claimed } = outcome;
@@ -51,7 +54,7 @@ export function VictoryModal({
             <PixelIcon name="star" size={16} color={theme.colors.yellow} />
           </View>
           <Image
-            source={require("@/assets/images/gato.png")}
+            source={petImage(session.account?.pet)}
             style={styles.pet}
             resizeMode="contain"
             accessibilityLabel="Tu mascota celebrando"

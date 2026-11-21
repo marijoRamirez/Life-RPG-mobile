@@ -4,10 +4,23 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomNav } from "@/components/ui/BottomNav";
 import { PixelIcon } from "@/components/ui/PixelIcons";
-import { POINT_META } from "@/constants/pointTypes";
+import { POINT_META, POINT_TYPES } from "@/constants/pointTypes";
 import { theme } from "@/constants/theme";
 import { wardrobeStyles as styles } from "@/styles/looks.styles";
 import { useWardrobeViewModel } from "@/viewmodels/useWardrobeViewModel";
+
+// Prenda en vista previa, junto a la mascota
+const previewBadge = {
+  position: "absolute" as const,
+  top: 0,
+  right: -8,
+  width: 32,
+  height: 32,
+  borderRadius: 16,
+  backgroundColor: theme.colors.yellow,
+  alignItems: "center" as const,
+  justifyContent: "center" as const,
+};
 
 // Vestidor (M01)
 export default function VestidorScreen() {
@@ -47,10 +60,41 @@ export default function VestidorScreen() {
         </View>
 
         <View style={styles.lookCard}>
-          <Text style={styles.lookSubtitle}>Look Actual</Text>
-          <Text style={styles.lookTitle}>{vm.lookName}</Text>
-          <Image source={require("@/assets/images/gato.png")} style={styles.mascotaImage} resizeMode="contain" />
+          <Text style={styles.lookSubtitle}>{vm.selected ? "Vista previa" : "Look Actual"}</Text>
+          <Text style={styles.lookTitle}>{vm.selected ? vm.selected.name : vm.lookName}</Text>
+          <View>
+            <Image source={vm.petImage} style={styles.mascotaImage} resizeMode="contain" />
+            {vm.selected && (
+              <View style={previewBadge}>
+                <PixelIcon name={vm.selected.icon} size={18} color={theme.colors.background} />
+              </View>
+            )}
+          </View>
         </View>
+
+        {/* RDF020 a RDF022: vista previa con equipar / quitar */}
+        {vm.selected && (
+          <View style={{ gap: 8, marginBottom: 16 }}>
+            {vm.lockedText ? (
+              <Text style={[styles.emptyStateText, { textAlign: "center" }]}>{vm.lockedText}</Text>
+            ) : (
+              <TouchableOpacity
+                style={[styles.saveButton, { marginTop: 0 }, vm.saving && { opacity: 0.5 }]}
+                onPress={vm.applySelected}
+                disabled={vm.saving}
+                accessibilityRole="button"
+              >
+                <Text style={styles.saveButtonText}>{vm.actionLabel}</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity onPress={vm.cancelPreview} accessibilityRole="button" style={{ alignSelf: "center", padding: 6 }}>
+              <Text style={{ color: theme.colors.textSecondary }}>Cancelar vista previa</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        {vm.notice && !vm.selected && (
+          <Text style={{ color: theme.colors.green, textAlign: "center", marginBottom: 12 }}>{vm.notice}</Text>
+        )}
 
         {/* Filtros interactivos */}
         <View style={styles.tabsContainer}>
@@ -65,11 +109,48 @@ export default function VestidorScreen() {
           ))}
         </View>
 
+        {/* RDF019: filtro por estadística */}
+        <View style={{ flexDirection: "row", gap: 6, marginBottom: 12 }}>
+          {(["todas", ...POINT_TYPES] as const).map((f) => {
+            const active = vm.statFilter === f;
+            return (
+              <TouchableOpacity
+                key={f}
+                onPress={() => vm.setStatFilter(f)}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: active }}
+                style={{
+                  flex: 1,
+                  height: 32,
+                  borderRadius: 16,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: active ? theme.colors.green : theme.colors.surfaceAlt,
+                }}
+              >
+                <Text style={{ fontSize: 12, fontWeight: "bold", color: active ? theme.colors.background : theme.colors.textPrimary }}>
+                  {f === "todas" ? "Todas" : POINT_META[f].label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
         {/* Cuadrícula de objetos filtrada */}
         <View style={styles.gridContainer}>
           {vm.filteredItems.length > 0 ? (
             vm.filteredItems.map((item) => (
-              <TouchableOpacity key={item.id} style={[styles.itemCard, item.equipped && styles.itemCardActive]}>
+              <TouchableOpacity
+                key={item.id}
+                style={[
+                  styles.itemCard,
+                  item.equipped && styles.itemCardActive,
+                  vm.selected?.id === item.id && { borderColor: theme.colors.yellow, borderWidth: 2 },
+                ]}
+                onPress={() => vm.select(item)}
+                accessibilityRole="button"
+                accessibilityLabel={`${item.name}, ${item.status}`}
+              >
                 <View style={styles.itemIconBox}>
                   <PixelIcon name="chevron-up" size={24} color={theme.colors.textPrimary} />
                 </View>

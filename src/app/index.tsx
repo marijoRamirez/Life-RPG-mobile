@@ -3,7 +3,8 @@ import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomNav } from "@/components/ui/BottomNav";
-import { CheckIcon, ClothesIcon, FocusIcon, HeartIcon, MoonIcon, PixelIcon, type PixelIconName } from "@/components/ui/PixelIcons";
+import { PetAvatar } from "@/components/ui/PetAvatar";
+import { CheckIcon, ClothesIcon, FocusIcon, HeartIcon, PixelIcon, SettingsIcon, type PixelIconName } from "@/components/ui/PixelIcons";
 import { homeStyles as styles } from "@/styles/home.styles";
 import { useTamagotchiViewModel } from "@/viewmodels/useTamagotchiViewModel";
 
@@ -16,18 +17,33 @@ export default function HUDPrincipalScreen() {
     <SafeAreaView style={styles.container} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <View style={styles.headerProfile}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}></Text>
+          {/* M01: el avatar abre Mi perfil; el engrane, Ajustes */}
+          <TouchableOpacity
+            style={styles.headerProfile}
+            onPress={() => router.push("/area1_jugabilidad/perfil/perfil")}
+            accessibilityRole="button"
+            accessibilityLabel="Mi perfil"
+          >
+            <View style={[styles.avatar, { overflow: "hidden" }]}>
+              {vm.photoUrl ? (
+                <Image source={{ uri: vm.photoUrl }} style={{ width: "100%", height: "100%" }} />
+              ) : (
+                <Text style={styles.avatarText}>{vm.initial}</Text>
+              )}
             </View>
             <View>
               <Text style={styles.dateText}>{vm.dateText}</Text>
               <Text style={styles.greetingText}>{vm.greeting}</Text>
             </View>
-          </View>
-          <View style={styles.toggleButton}>
-            <MoonIcon size={16} color="#FFFFFF" />
-          </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.toggleButton}
+            onPress={() => router.push("/area1_jugabilidad/perfil/ajustes")}
+            accessibilityRole="button"
+            accessibilityLabel="Ajustes"
+          >
+            <SettingsIcon size={16} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.card}>
@@ -59,7 +75,7 @@ export default function HUDPrincipalScreen() {
           </View>
         </View>
 
-        <View style={styles.tamagotchiCard}>
+        <View style={[styles.tamagotchiCard, { backgroundColor: vm.petColor, height: 230, paddingBottom: 8 }]}>
           <View style={styles.habitatBadge}>
             <Text style={styles.habitatText}>{vm.habitat}</Text>
           </View>
@@ -76,7 +92,8 @@ export default function HUDPrincipalScreen() {
             </TouchableOpacity>
           )}
 
-          <Image source={require("@/assets/images/gato.png")} style={{ width: 128, height: 128 }} resizeMode="contain" />
+          {/* RDF016: mascota animada con su ropa y su estado según el HP */}
+          <PetAvatar species={vm.petSpecies} hp={vm.hp} hpMax={vm.hpMax} equipped={vm.equipped} size={112} />
         </View>
 
         <View style={styles.attributesContainer}>

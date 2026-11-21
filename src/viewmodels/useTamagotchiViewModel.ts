@@ -2,11 +2,15 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 
 import type { PixelIconName } from "@/components/ui/PixelIcons";
+import { petColorValue, petImage } from "@/constants/petTypes";
+import type { WardrobeItem } from "@/models/Wardrobe";
 import type { PointType } from "@/models/common";
 import type { Tamagotchi } from "@/models/Tamagotchi";
 import type { Attributes, UserProfile } from "@/models/UserProfile";
 import { getTamagotchi } from "@/services/tamagotchiService";
 import { getAttributes, getUserProfile } from "@/services/userService";
+import { getWardrobe } from "@/services/wardrobeService";
+import { useSession } from "./SessionProvider";
 
 // ViewModel de la Casa / HUD principal (M01).
 
@@ -16,10 +20,12 @@ const MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", 
 const percent = (value: number) => `${Math.round(value * 100)}%`;
 
 export function useTamagotchiViewModel() {
+  const session = useSession();
   const [pet, setPet] = useState<Tamagotchi | null>(null);
   const [attributes, setAttributes] = useState<Attributes | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [wardrobe, setWardrobe] = useState<WardrobeItem[]>([]);
 
   const load = useCallback(async () => {
     setError(null);
@@ -28,6 +34,8 @@ export function useTamagotchiViewModel() {
       setPet(p);
       setAttributes(a);
       setProfile(u);
+      // RDF016: la ropa equipada se dibuja sobre la mascota (si falla, la mascota sale sin ropa)
+      setWardrobe(await getWardrobe().catch(() => []));
     } catch {
       setError("No se pudo cargar tu mascota.");
     }
@@ -64,6 +72,16 @@ export function useTamagotchiViewModel() {
     hpWidth: pet ? percent(pet.hp / pet.hpMax) : "0%",
     xpPercent: pet ? percent(pet.xp / pet.xpForNextLevel) : "0%",
     habitat: pet?.habitat ?? "",
+    // Animal elegido en la Bienvenida (M00); el gato si la cuenta aún no tiene
+    petImage: petImage(session.account?.pet),
+    petSpecies: session.account?.pet ?? null,
+    petColor: petColorValue(session.account?.petColor),
+    hp: pet?.hp ?? 100,
+    hpMax: pet?.hpMax ?? 100,
+    equipped: wardrobe.filter((w) => w.equipped).map((w) => ({ id: w.id, name: w.name, icon: w.icon })),
+    // Avatar del encabezado: foto de perfil o inicial del nombre
+    photoUrl: session.account?.photoUrl ?? null,
+    initial: (session.account?.firstName ?? profile?.displayName ?? "?").trim().charAt(0).toUpperCase(),
     attributeRows,
     error,
   };

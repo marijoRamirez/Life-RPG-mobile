@@ -1,4 +1,5 @@
-import { API_TIMEOUT_MS, API_URL, DEV_USER_ID } from "@/config/env";
+import { API_TIMEOUT_MS, DEV_USER_ID } from "@/config/env";
+import { getApiUrl } from "./serverConfig";
 
 // Cliente HTTP único de la app. Todos los servicios llaman al backend por aquí.
 // Se encarga de: URL base, identificar al usuario, tiempo límite y errores.
@@ -16,26 +17,35 @@ export class ApiError extends Error {
 }
 
 let authToken: string | null = null;
+let tokenProvider: (() => Promise<string | null>) | null = null;
 
-// Lo llama el módulo de autenticación (M00) al iniciar o cerrar sesión
+// Token fijo (opcional). Se mantiene por compatibilidad.
 export function setAuthToken(token: string | null) {
   authToken = token;
+}
+
+// Lo registra la sesión (M00) con Firebase: entrega un token vigente en cada petición,
+// porque el token de Firebase caduca cada hora y el SDK lo renueva solo.
+export function setAuthTokenProvider(provider: (() => Promise<string | null>) | null) {
+  tokenProvider = provider;
 }
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 async function request<T>(method: Method, path: string, body?: unknown): Promise<T> {
+  const token = authToken ?? (tokenProvider ? await tokenProvider().catch(() => null) : null);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
 
   let res: Response;
   try {
-    res = await fetch(`${API_URL}${path}`, {
+    // La dirección puede cambiarse en Ajustes › Servidor (RDF011)
+    res = await fetch(`${getApiUrl()}${path}`, {
       method,
       headers: {
         "Content-Type": "application/json",
-        // Con sesión: token JWT. Sin login todavía: usuario de prueba.
-        ...(authToken ? { Authorization: `Bearer ${authToken}` } : { "x-user-id": DEV_USER_ID }),
+        // Con Firebase: token de la sesión. En modo de prueba: usuario de prueba.
+        ...(token ? { Authorization: `Bearer ${token}` } : { "x-user-id": DEV_USER_ID }),
       },
       body: body === undefined ? undefined : JSON.stringify(body),
       signal: controller.signal,
