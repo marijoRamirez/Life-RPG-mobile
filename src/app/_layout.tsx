@@ -73,6 +73,12 @@ function SessionGate() {
         >
           <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fonts.retro }}>Reintentar</Text>
         </TouchableOpacity>
+        {/* Si la sesión no sirve (vencida, otra cuenta con ese correo), poder entrar con otra */}
+        {session.user && (
+          <TouchableOpacity onPress={session.signOut} accessibilityRole="button" style={{ paddingVertical: 8, paddingHorizontal: 24 }}>
+            <Text style={{ color: theme.colors.textSecondary, fontSize: 14 }}>Cerrar sesión</Text>
+          </TouchableOpacity>
+        )}
       </View>
     );
   }

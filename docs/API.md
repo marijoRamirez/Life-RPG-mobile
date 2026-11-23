@@ -29,9 +29,11 @@ Si algo tiene que cambiar, **se cambia primero aquí** y después en los dos lad
 
 - **Con inicio de sesión (M00, modo `firebase`):** el móvil inicia sesión con **Firebase Authentication** y envía
   `Authorization: Bearer <ID token de Firebase>` en cada petición (Firebase lo renueva solo cada hora).
-  El backend lo valida con `firebase-admin` (`verifyIdToken`) y usa el `uid` como id del usuario.
+  El backend lo valida con las llaves públicas de Google (necesita `FIREBASE_PROJECT_ID` en su `.env`) y lo
+  convierte en su usuario de MongoDB: lo encuentra por `uid`, lo liga al usuario que ya tenía ese correo o lo crea.
+  Token inválido o vencido: `401` con el mensaje listo para mostrarse.
 - **En los modos de prueba (`mock` y `mock-login`):** no hay token y el móvil envía `x-user-id: u-1`
-  (variable `EXPO_PUBLIC_DEV_USER_ID`), igual que antes. El backend debe aceptar los dos mientras se integra el M00.
+  (variable `EXPO_PUBLIC_DEV_USER_ID`), igual que antes. Fuera de producción el backend lo atiende como su `DEV_USER_ID`.
 - El backend toma al usuario **solo** de ahí. Ninguna ruta recibe el id del usuario en la URL ni en el cuerpo; "el usuario actual" es `/usuarios/me`.
 - Cada usuario solo puede ver y modificar sus propios datos.
 
@@ -76,12 +78,13 @@ Datos compartidos por la Casa, la Tienda, el Vestidor y el Ánimo. Modelos: `Use
 ### M00 · Cuenta del jugador · módulo móvil `usuarios`
 
 La **contraseña y el correo los maneja Firebase**, no el backend. El backend guarda los datos del juego
-de cada `uid`. Modelo: `Account.ts`.
+de cada `uid`. Modelo: `Account.ts` (`id` es el `uid` de Firebase). En modo `firebase` estas rutas siempre van al
+backend, aunque `usuarios` no esté en `EXPO_PUBLIC_API_MODULES`.
 
 | Método y ruta | Cuerpo | Responde | Notas |
 | :-- | :-- | :-- | :-- |
 | `GET /usuarios/me/cuenta` | — | `Account` | **`404` si aún no llena "Crear cuenta"**: el móvil lo lleva a esa pantalla. |
-| `POST /usuarios/me/cuenta` | `NewAccountInput` | `Account` (`201`) | RDF001. `firstName` y `lastName` obligatorios (máx. 40); `age` entero de 1 a 120; `gender`: `"mujer"`, `"hombre"`, `"no_binario"` o `"prefiero_no_decir"`; `goals`: lista de `"lectura"`, `"ejercicio"`, `"enfoque"`, `"sueno"`, `"animo"`; `customGoal`: texto (máx. 60) o `null`. Al menos una meta o `customGoal`. Crea la cuenta con `pet: null`. |
+| `POST /usuarios/me/cuenta` | `NewAccountInput` | `Account` (`201`) | RDF001. `firstName` y `lastName` obligatorios (máx. 40); `age` entero de 1 a 120; `gender`: `"mujer"`, `"hombre"`, `"no_binario"` o `"prefiero_no_decir"`; `goals`: lista de `"lectura"`, `"ejercicio"`, `"enfoque"`, `"sueno"`, `"animo"`; `customGoal`: texto (máx. 60) o `null`. Al menos una meta o `customGoal`. Crea la cuenta con `pet: null`. `409` si ya existe. |
 | `PUT /usuarios/me/cuenta` | `AccountChanges` | `Account` | Mi perfil (RDF024, RDF026). Mismos campos, todos opcionales, más `photoUrl` y `petColor` (`"verde"`, `"morado"`, `"rojo"`, `"azul"` o `"naranja"`; colorea el aura y el hábitat de la mascota). |
 | `PUT /usuarios/me/mascota` | `{ "pet": "dragon" }` | `Account` | "Bienvenido a Life-RPG". `pet`: `"gato"`, `"perro"`, `"dragon"`, `"hamster"` o `"leon"`. **Solo una vez por cuenta**: `400` si ya tiene mascota. Crea su Tamagotchi. |
 
