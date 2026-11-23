@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import type { Account, AuthUser } from "@/models/Account";
-import { setAuthTokenProvider } from "@/services/apiClient";
+import { ApiError, setAuthTokenProvider } from "@/services/apiClient";
 import { getIdToken, observeAuth, signOut as authSignOut } from "@/services/authService";
 import { loadServerConfig } from "@/services/serverConfig";
 import { setSessionUserId } from "@/services/session";
@@ -30,6 +30,11 @@ interface SessionValue {
 
 const SessionContext = createContext<SessionValue | null>(null);
 
+// Mensaje para la pantalla de error: el del servidor si respondió (p. ej. sesión vencida
+// o falta FIREBASE_PROJECT_ID en el backend); si no hubo respuesta, el de conexión.
+const accountErrorMessage = (error: unknown) =>
+  error instanceof ApiError && error.status !== 0 ? error.message : "No se pudo cargar tu cuenta. Revisa tu conexión.";
+
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [account, setAccount] = useState<Account | null>(null);
@@ -40,9 +45,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setError(null);
     try {
       setAccount(await getAccount());
-    } catch {
+    } catch (err) {
       setAccount(null);
-      setError("No se pudo cargar tu cuenta. Revisa tu conexión.");
+      setError(accountErrorMessage(err));
     }
   }, []);
 
@@ -61,8 +66,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       if (next) {
         try {
           nextAccount = await getAccount();
-        } catch {
-          nextError = "No se pudo cargar tu cuenta. Revisa tu conexión.";
+        } catch (err) {
+          nextError = accountErrorMessage(err);
         }
       }
       setUser(next);

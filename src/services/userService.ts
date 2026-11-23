@@ -1,4 +1,4 @@
-import { usesApi } from "@/config/env";
+import { AUTH_MODE, usesApi } from "@/config/env";
 import { ENDPOINTS } from "@/constants/endpoints";
 import type { Account, AccountChanges, NewAccountInput, PetSpecies } from "@/models/Account";
 import type { Wallet } from "@/models/common";
@@ -27,10 +27,14 @@ export const getPrivacy = (): Promise<PrivacySettings> =>
   real ? api.get(ENDPOINTS.usuarios.privacidad) : mock.getPrivacy();
 
 // ── Cuenta del juego (M00) ─────────────────────────────────────────────
+// Con Firebase la cuenta SIEMPRE vive en el backend (aunque "usuarios" no esté en
+// EXPO_PUBLIC_API_MODULES): así el jugador la encuentra al entrar desde otro celular.
+const accountReal = real || AUTH_MODE === "firebase";
+
 
 // GET /usuarios/me/cuenta — null (404) si todavía no llena "Crear cuenta"
 export const getAccount = async (): Promise<Account | null> => {
-  if (!real) return mock.getAccount();
+  if (!accountReal) return mock.getAccount();
   try {
     return await api.get<Account>(ENDPOINTS.usuarios.cuenta);
   } catch (error) {
@@ -41,15 +45,15 @@ export const getAccount = async (): Promise<Account | null> => {
 
 // POST /usuarios/me/cuenta — RDF001 · agregarUsuario (datos del formulario)
 export const createAccount = (email: string, input: NewAccountInput): Promise<Account> =>
-  real ? api.post(ENDPOINTS.usuarios.cuenta, input) : mock.createAccount(email, input);
+  accountReal ? api.post(ENDPOINTS.usuarios.cuenta, input) : mock.createAccount(email, input);
 
 // PUT /usuarios/me/mascota — animal elegido en "Bienvenido a Life-RPG" (una sola vez por cuenta)
 export const choosePet = (pet: PetSpecies): Promise<Account> =>
-  real ? api.put(ENDPOINTS.usuarios.mascota, { pet }) : mock.choosePet(pet);
+  accountReal ? api.put(ENDPOINTS.usuarios.mascota, { pet }) : mock.choosePet(pet);
 
 // PUT /usuarios/me/cuenta — Mi perfil: nombre, edad, género, metas y foto (RDF024, RDF026)
 export const updateAccount = (changes: AccountChanges): Promise<Account> =>
-  real ? api.put(ENDPOINTS.usuarios.cuenta, changes) : mock.updateAccount(changes);
+  accountReal ? api.put(ENDPOINTS.usuarios.cuenta, changes) : mock.updateAccount(changes);
 
 // PUT /usuarios/me/privacidad — Ajustes › Privacidad (RDF071)
 export const updatePrivacy = (visibleToViewers: boolean): Promise<PrivacySettings> =>
