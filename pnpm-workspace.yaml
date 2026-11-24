@@ -1,0 +1,7 @@
+allowBuilds:
+  '@firebase/util': true
+  protobufjs: true
+
+# Windows: con la estructura aislada de pnpm las rutas nativas pasan de 260 caracteres
+# y el build de Android (CMake/ninja) falla. "hoisted" deja node_modules como npm.
+nodeLinker: hoisted

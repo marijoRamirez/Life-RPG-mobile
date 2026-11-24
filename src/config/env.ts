@@ -52,7 +52,7 @@ export const FIREBASE_CONFIG = {
 };
 
 // ID de cliente web de Google (Firebase › Authentication › Google › Configuración del SDK web)
-export const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? "";
+export const GOOGLE_WEB_CLIENT_ID = (process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? "").trim();
 
 const requestedMode = (process.env.EXPO_PUBLIC_AUTH_MODE ?? "mock").trim().toLowerCase();
 
