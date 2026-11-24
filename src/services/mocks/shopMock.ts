@@ -11,18 +11,19 @@ import type {
 } from "@/models/Item";
 import { copy, delay, newId } from "./mockUtils";
 import { peekPoints, spendPoints } from "./userMock";
+import { assetName, itemAsset } from "@/constants/itemAssets";
 
 // Datos simulados del Módulo 4 (Tienda de la mascota).
 // Imitan lo que responde la API (docs/API.md) mientras el módulo no esté conectado.
 
 
 let shopItems: ShopItem[] = [
-  { id: "s1", name: "Noche de cine", icon: "star", price: 300, pointType: "cultura", isCustom: true },
-  { id: "s2", name: "Libro nuevo", icon: "book-open", price: 480, pointType: "cultura" },
-  { id: "s3", name: "Mancuernas 5 kg", icon: "dumbbell", price: 600, pointType: "fisico" },
-  { id: "s4", name: "Día de descanso", icon: "moon", price: 280, pointType: "fisico", isCustom: true },
-  { id: "s5", name: "Café de especialidad", icon: "heart", price: 180, pointType: "enfoque", isCustom: true },
-  { id: "s6", name: "1 h de videojuegos", icon: "trophy", price: 200, pointType: "enfoque" },
+  // ...los s1 a s6 de siempre...
+  { id: "gorra-corredor", name: "Gorra de corredor", icon: "dumbbell", price: 120, pointType: "fisico" },
+  { id: "bufanda-roja", name: "Bufanda roja", icon: "dumbbell", price: 150, pointType: "fisico" },
+  { id: "lentes-sol", name: "Lentes de sol", icon: "book-open", price: 220, pointType: "cultura" },
+  { id: "sudadera", name: "Sudadera", icon: "focus", price: 260, pointType: "enfoque" },
+  { id: "fondo-bosque-mistico", name: "Bosque místico", icon: "focus", price: 500, pointType: "enfoque" },
 ];
 
 // Rango de precio permitido por la economía global (M14). En el servidor sale de su configuración.
@@ -54,10 +55,10 @@ let inventory: Inventory = {
     { id: "c3", name: "Doble XP 24 h", icon: "streak", quantity: 1, giftFrom: "Leo" },
   ],
   clothing: [
-    { id: "w1", name: "Boina", icon: "clothes", equipped: true },
-    { id: "w2", name: "Gorro", icon: "clothes", equipped: false },
-    { id: "w3", name: "Banda", icon: "clothes", equipped: false },
-    { id: "w4", name: "Lentes", icon: "focus", equipped: true },
+    { id: "boina-lector", name: "Boina", icon: "clothes", equipped: true },
+    { id: "gorro-lana", name: "Gorro", icon: "clothes", equipped: false },
+    { id: "banda-deportiva", name: "Banda", icon: "clothes", equipped: false },
+    { id: "lentes-redondos", name: "Lentes", icon: "focus", equipped: true },
   ],
 };
 
@@ -71,10 +72,20 @@ export function getShopItems(): Promise<ShopItem[]> {
 export function buyItem(itemId: string): Promise<PurchaseResult> {
   const item = shopItems.find((i) => i.id === itemId);
   if (!item) return Promise.reject(new Error("El artículo ya no está disponible."));
+  const isClothing = Boolean(itemAsset(assetName(item)));
+  if (isClothing && inventory.clothing.some((c) => c.id === item.id)) {
+    return Promise.reject(new Error("Ya tienes esta prenda."));
+  }
   if (peekPoints()[item.pointType] < item.price) {
     return Promise.reject(new Error("No tienes puntos suficientes."));
   }
   const wallet = spendPoints(item.pointType, item.price);
+
+  if (isClothing) {
+    const clothing = { id: item.id, name: item.name, icon: item.icon, equipped: false, asset: item.asset ?? null };
+    inventory = { ...inventory, clothing: [...inventory.clothing, clothing] };
+    return delay({ wallet, clothing });
+  }
   const reward: OwnedReward = { id: newId("r"), name: item.name, icon: item.icon, subtitle: "Comprada hoy · lista para canjear" };
   inventory = { ...inventory, rewards: [...inventory.rewards, reward] };
   return delay({ wallet, reward });

@@ -8,6 +8,7 @@ import { SHOP_COLORS as COLORS } from "@/constants/shopTypes";
 import type { Consumable, OwnedReward } from "@/models/Item";
 import { inventoryStyles as styles } from "@/styles/shop.styles";
 import { useInventoryViewModel } from "@/viewmodels/useInventoryViewModel";
+import { ItemThumb } from "@/components/tienda/ItemThumb";
 
 // 4.3 Inventario
 export default function InventarioScreen() {
@@ -94,7 +95,7 @@ export default function InventarioScreen() {
               activeOpacity={0.8}
               onPress={() => vm.toggle(c.id)}
             >
-              <PixelIcon name={c.icon} size={32} color={COLORS.text} />
+              <ItemThumb item={c} size={32} color={COLORS.text} />   {/* ← reemplaza al PixelIcon */}
               <Text style={styles.clothingName}>{c.name}</Text>
             </TouchableOpacity>
           ))}
