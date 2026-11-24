@@ -9,6 +9,7 @@ import { FILTERS, SHOP_COLORS as COLORS } from "@/constants/shopTypes";
 import type { ShopItem } from "@/models/Item";
 import { showcaseStyles as styles } from "@/styles/shop.styles";
 import { useShopShowcaseViewModel } from "@/viewmodels/useShopShowcaseViewModel";
+import { ItemThumb } from "@/components/tienda/ItemThumb";
 
 // 4.1 Escaparate
 export default function EscaparateScreen() {
@@ -89,7 +90,7 @@ export default function EscaparateScreen() {
                 onPress={() => handlePress(item)}
               >
                 <View style={styles.iconBox}>
-                  <PixelIcon name={item.icon} size={32} color={COLORS.text} />
+                  <ItemThumb item={item} size={32} color={COLORS.text} />
                   {item.isCustom && (
                     <View style={styles.badge}>
                       <Text style={styles.badgeText}>TUYA</Text>

@@ -18,9 +18,11 @@ export interface ShopItem {
 }
 
 // Respuesta al comprar: puntos que quedan y la recompensa que entra al inventario
+// Respuesta al comprar: puntos que quedan y lo que entra al inventario
 export interface PurchaseResult {
   wallet: Wallet;
-  reward: OwnedReward;
+  reward?: OwnedReward; // Recompensas
+  clothing?: ClothingItem; // Fondos y accesorios (traen asset)
 }
 
 // 4.2 Recompensa personalizada
