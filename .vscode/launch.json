@@ -1,0 +1,44 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Mobile: Iniciar Metro para la app instalada (dev build)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npx expo start --dev-client",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Mobile: Iniciar Expo Go (pnpm start)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "pnpm start",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Mobile: Compilar e instalar en Android (pnpm android)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "pnpm android",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "JAVA_HOME": "C:\\Program Files\\Android\\Android Studio\\jbr"
+      }
+    },
+    {
+      "name": "Mobile: Expo Web",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "pnpm web",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Mobile: Adjuntar debugger a la app (Expo Tools)",
+      "type": "expo",
+      "request": "attach",
+      "projectRoot": "${workspaceFolder}",
+      "bundlerPort": "8081",
+      "bundlerHost": "127.0.0.1"
+    }
+  ]
+}
