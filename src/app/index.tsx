@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomNav } from "@/components/ui/BottomNav";
@@ -75,7 +75,13 @@ export default function HUDPrincipalScreen() {
           </View>
         </View>
 
-        <View style={[styles.tamagotchiCard, { backgroundColor: vm.petColor, height: 230, paddingBottom: 8 }]}>
+        {/* Hábitat: el fondo equipado (assets/vestidor/fondos); el color de la mascota queda como su marco */}
+        <View
+          style={[styles.tamagotchiCard, { backgroundColor: vm.petColor, height: 230, paddingBottom: 8, overflow: "hidden", borderWidth: 3, borderColor: vm.petColor }]}
+        >
+          {vm.background && (
+            <Image source={vm.background.source} style={[StyleSheet.absoluteFill, { width: "100%", height: "100%" }]} resizeMode="cover" accessibilityIgnoresInvertColors />
+          )}
           <View style={styles.habitatBadge}>
             <Text style={styles.habitatText}>{vm.habitat}</Text>
           </View>

@@ -1,6 +1,7 @@
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 
+import { assetName, DEFAULT_BACKGROUND, itemAsset } from "@/constants/itemAssets";
 import { petImage } from "@/constants/petTypes";
 import { WARDROBE_CATEGORIES } from "@/constants/wardrobeTypes";
 import type { PointType, Wallet } from "@/models/common";
@@ -63,6 +64,12 @@ export function useWardrobeViewModel() {
 
   const selected = items.find((i) => i.id === selectedId) ?? null;
 
+  // Vista previa (RDF020): lo equipado, con la prenda elegida en lugar de la de su misma parte
+  const previewItems = selected
+    ? [...items.filter((i) => i.equipped && i.category !== selected.category), selected]
+    : items.filter((i) => i.equipped);
+  const previewBackground = previewItems.find((i) => i.category === "Fondo");
+
   const applySelected = async () => {
     if (!selected || !selected.owned || saving) return;
     setSaving(true);
@@ -98,7 +105,14 @@ export function useWardrobeViewModel() {
     loading,
     error,
     petImage: petImage(session.account?.pet),
+    petSpecies: session.account?.pet ?? null,
+    // Imagen de cada prenda para la cuadrícula (null = todavía no tiene asset)
+    itemImage: (item: WardrobeItem) => itemAsset(assetName(item)),
     // Vista previa (RDF020): no guarda nada hasta tocar "Equipar"
+    previewEquipped: previewItems
+      .filter((i) => i.category !== "Fondo")
+      .map((i) => ({ id: i.id, name: i.name, icon: i.icon, asset: i.asset })),
+    previewBackground: itemAsset(previewBackground ? assetName(previewBackground) : DEFAULT_BACKGROUND),
     selected,
     select: (item: WardrobeItem) => {
       setNotice(null);

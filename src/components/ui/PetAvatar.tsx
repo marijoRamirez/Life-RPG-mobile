@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, Animated, Easing, Image, StyleSheet, Text, View } from "react-native";
 
+import { itemAsset } from "@/constants/itemAssets";
 import { petImage } from "@/constants/petTypes";
 import { theme } from "@/constants/theme";
 import type { PetSpecies } from "@/models/Account";
 import { PixelIcon, type PixelIconName } from "./PixelIcons";
 
-// Mascota animada (M01 · RDF016): se dibuja con su ropa equipada y con un estado
+// Mascota animada (M01 · RDF016): se dibuja con su ropa equipada (las imágenes de
+// constants/itemAssets.ts van encima de la mascota) y con un estado
 // visual según su HP. Feliz (70+) brinca alegre, Cansado (40-69) se mueve lento y
 // Enfermo (menos de 40) se queda quieto y apagado. Si el sistema pide reducir el
 // movimiento, no se anima.
@@ -24,18 +26,29 @@ const MOOD_META: Record<PetMood, { label: string; icon: PixelIconName; color: st
   enfermo: { label: "Enfermo", icon: "info", color: "#FF6B5E", bounce: 0, ms: 0 },
 };
 
+export type EquippedItem = { id: string; name: string; icon: PixelIconName; asset?: string | null };
+
+// Orden en que se apilan las prendas: el cuerpo abajo y la cabeza hasta arriba
+const LAYER = { Fondo: -1, Cuerpo: 0, Cara: 1, Cabeza: 2 } as const;
+
 type Props = {
   species: PetSpecies | null | undefined;
   hp?: number;
   hpMax?: number;
   size?: number;
-  equipped?: { id: string; name: string; icon: PixelIconName }[]; // Ropa equipada
+  equipped?: EquippedItem[]; // Ropa equipada
   showMood?: boolean; // Etiqueta "Feliz / Cansado / Enfermo"
 };
 
 export function PetAvatar({ species, hp = 100, hpMax = 100, size = 128, equipped = [], showMood = true }: Props) {
   const mood = petMoodFromHp(hp, hpMax);
   const meta = MOOD_META[mood];
+  // Las prendas con imagen se dibujan sobre la mascota; las que aún no tienen, como insignia
+  const layers = equipped
+    .map((item) => ({ item, asset: itemAsset(item.asset ?? item.id) }))
+    .flatMap(({ item, asset }) => (asset && asset.category !== "Fondo" ? [{ item, asset }] : []))
+    .sort((a, b) => LAYER[a.asset.category] - LAYER[b.asset.category]);
+  const badges = equipped.filter((item) => !itemAsset(item.asset ?? item.id));
   const offset = useRef(new Animated.Value(0)).current;
   const [reduceMotion, setReduceMotion] = useState(false);
 
@@ -58,16 +71,26 @@ export function PetAvatar({ species, hp = 100, hpMax = 100, size = 128, equipped
 
   return (
     <View style={styles.wrap} accessibilityLabel={`Tu mascota está ${meta.label.toLowerCase()}`}>
-      <Animated.View style={{ transform: [{ translateY: offset }] }}>
-        <Image
-          source={petImage(species)}
-          style={{ width: size, height: size, opacity: mood === "enfermo" ? 0.6 : 1 }}
-          resizeMode="contain"
-        />
+      <Animated.View
+        style={{ width: size, height: size, opacity: mood === "enfermo" ? 0.6 : 1, transform: [{ translateY: offset }] }}
+        accessibilityLabel={equipped.length ? `Lleva puesto: ${equipped.map((e) => e.name).join(", ")}` : undefined}
+      >
+        <Image source={petImage(species)} style={{ width: size, height: size }} resizeMode="contain" />
+        {layers.map(({ item, asset }) => {
+          const w = size * (asset.width ?? 0.5);
+          return (
+            <Image
+              key={item.id}
+              source={asset.source}
+              style={{ position: "absolute", left: (size - w) / 2, top: size * (asset.top ?? 0), width: w, height: w / (asset.aspect ?? 1) }}
+              resizeMode="contain"
+            />
+          );
+        })}
       </Animated.View>
-      {equipped.length > 0 && (
-        <View style={styles.equipRow} accessibilityLabel={`Lleva puesto: ${equipped.map((e) => e.name).join(", ")}`}>
-          {equipped.map((e) => (
+      {badges.length > 0 && (
+        <View style={styles.equipRow}>
+          {badges.map((e) => (
             <View key={e.id} style={styles.equipBadge}>
               <PixelIcon name={e.icon} size={12} color={theme.colors.background} />
             </View>

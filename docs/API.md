@@ -115,6 +115,24 @@ Modelo: `Wardrobe.ts`.
 
 `WardrobeItem.owned`: `false` si la prenda aún no es del jugador (se compra, se gana con un logro o se desbloquea por nivel; `status` dice cuál).
 
+#### Imágenes de fondos y accesorios (`asset`)
+
+Las imágenes viven **en la app** (`assets/vestidor/fondos/` y `assets/vestidor/accesorios/`); el backend **no** guarda ni
+sirve archivos. En la base de datos cada artículo solo guarda el **nombre** de su imagen: minúsculas, con guiones y sin
+`.png` (`"boina-lector"`, `"fondo-bosque-mistico"`).
+
+- `WardrobeItem`, `ShopItem` y `ClothingItem` pueden traer `asset: string | null` con ese nombre.
+- Si no traen `asset`, la app usa el `id` del artículo como nombre. Por eso conviene que el `id`/`slug` del catálogo sea el mismo nombre.
+- Si el nombre no existe en la app, se muestra el ícono de siempre (`icon`); nada truena.
+- Lista de nombres disponibles y cómo agregar uno nuevo: `src/constants/itemAssets.ts`.
+
+| Parte | Nombres disponibles |
+| :-- | :-- |
+| Cabeza | `boina-lector`, `gorro-lana`, `banda-deportiva`, `gorra-corredor`, `capucha-monje`, `corona-sabio` |
+| Cara | `lentes-sol`, `lentes-redondos` |
+| Cuerpo | `bufanda-roja`, `sudadera` |
+| Fondo | `fondo-casa` (el que se ve si no hay ninguno equipado), `fondo-bosque-mistico` |
+
 ### M02 · Hábitos diarios · módulo móvil `habitos`
 
 Modelo: `Quest.ts`. Recompensa por dificultad: `facil` 10, `media` 20, `dificil` 40 (XP y puntos del tipo del hábito).
@@ -158,7 +176,7 @@ Modelo: `Item.ts`. Los puntos se consultan en `GET /usuarios/me/puntos`.
 
 | Método y ruta | Cuerpo | Responde | Notas |
 | :-- | :-- | :-- | :-- |
-| `GET /tienda/articulos` | — | `ShopItem[]` | |
+| `GET /tienda/articulos` | — | `ShopItem[]` | Los fondos y accesorios traen `asset` (ver "Imágenes de fondos y accesorios" en M01). |
 | `POST /tienda/compras` | `{ "itemId": "s1" }` | `PurchaseResult` | Valida que alcancen los puntos del tipo del artículo y los descuenta. `400` si no alcanzan. |
 | `GET /tienda/precio-sugerido` | — | `SuggestedPrice` | `min`/`max`: sugerido para el nivel. `allowedMin`/`allowedMax`: rango permitido por la economía global (M14, RDF054); fuera de él, crear o editar responde `400`. |
 | `POST /tienda/recompensas` | `NewRewardInput` | `ShopItem` | Nombre obligatorio y precio mayor a 0 (dentro del rango del M14). Queda con `isCustom: true`. |
