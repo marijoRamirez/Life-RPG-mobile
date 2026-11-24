@@ -14,6 +14,7 @@ export interface ShopItem {
   price: number;
   pointType: PointType;
   isCustom?: boolean; // Recompensa creada por el usuario → badge "TUYA"
+  asset?: string | null; // Fondos y accesorios: nombre de su imagen (constants/itemAssets.ts)
 }
 
 // Respuesta al comprar: puntos que quedan y la recompensa que entra al inventario
@@ -68,6 +69,7 @@ export interface ClothingItem {
   icon: ItemIconName;
   giftFrom?: string | null; // Alias del amigo que lo regaló (M08 · RDF057); null si lo compró
   equipped: boolean;
+  asset?: string | null; // Nombre de su imagen (constants/itemAssets.ts)
 }
 
 export interface Inventory {

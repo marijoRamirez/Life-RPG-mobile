@@ -2,6 +2,7 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 
 import type { PixelIconName } from "@/components/ui/PixelIcons";
+import { assetName, DEFAULT_BACKGROUND, itemAsset } from "@/constants/itemAssets";
 import { petColorValue, petImage } from "@/constants/petTypes";
 import type { WardrobeItem } from "@/models/Wardrobe";
 import type { PointType } from "@/models/common";
@@ -48,6 +49,8 @@ export function useTamagotchiViewModel() {
     }, [load]),
   );
 
+  const equippedBackground = wardrobe.find((w) => w.equipped && w.category === "Fondo");
+
   const today = new Date();
   const dateText = `${DAYS[today.getDay()]} ${today.getDate()} de ${MONTHS[today.getMonth()]}`;
 
@@ -71,14 +74,19 @@ export function useTamagotchiViewModel() {
     hpText: pet ? `${pet.hp}/${pet.hpMax}` : "",
     hpWidth: pet ? percent(pet.hp / pet.hpMax) : "0%",
     xpPercent: pet ? percent(pet.xp / pet.xpForNextLevel) : "0%",
-    habitat: pet?.habitat ?? "",
+    // Fondo equipado (o La Casa si no hay); su nombre va en la etiqueta del hábitat
+    habitat: equippedBackground?.name ?? pet?.habitat ?? "",
+    background: itemAsset(equippedBackground ? assetName(equippedBackground) : DEFAULT_BACKGROUND),
     // Animal elegido en la Bienvenida (M00); el gato si la cuenta aún no tiene
     petImage: petImage(session.account?.pet),
     petSpecies: session.account?.pet ?? null,
     petColor: petColorValue(session.account?.petColor),
     hp: pet?.hp ?? 100,
     hpMax: pet?.hpMax ?? 100,
-    equipped: wardrobe.filter((w) => w.equipped).map((w) => ({ id: w.id, name: w.name, icon: w.icon })),
+    // RDF016: prendas equipadas (PetAvatar las dibuja con su imagen de constants/itemAssets.ts)
+    equipped: wardrobe
+      .filter((w) => w.equipped && w.category !== "Fondo")
+      .map((w) => ({ id: w.id, name: w.name, icon: w.icon, asset: w.asset })),
     // Avatar del encabezado: foto de perfil o inicial del nombre
     photoUrl: session.account?.photoUrl ?? null,
     initial: (session.account?.firstName ?? profile?.displayName ?? "?").trim().charAt(0).toUpperCase(),
