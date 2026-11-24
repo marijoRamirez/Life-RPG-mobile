@@ -1,26 +1,29 @@
 import { Stack, useRouter } from "expo-router";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomNav } from "@/components/ui/BottomNav";
+import { PetAvatar } from "@/components/ui/PetAvatar";
 import { PixelIcon } from "@/components/ui/PixelIcons";
 import { POINT_META, POINT_TYPES } from "@/constants/pointTypes";
 import { theme } from "@/constants/theme";
 import { wardrobeStyles as styles } from "@/styles/looks.styles";
 import { useWardrobeViewModel } from "@/viewmodels/useWardrobeViewModel";
 
-// Prenda en vista previa, junto a la mascota
-const previewBadge = {
-  position: "absolute" as const,
-  top: 0,
-  right: -8,
-  width: 32,
-  height: 32,
-  borderRadius: 16,
-  backgroundColor: theme.colors.yellow,
+// Nombre del look, legible sobre cualquier fondo
+const lookLabel = {
   alignItems: "center" as const,
-  justifyContent: "center" as const,
+  alignSelf: "center" as const,
+  marginBottom: 8,
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 12,
+  backgroundColor: "rgba(18,18,26,0.7)",
 };
+
+// Miniaturas de la cuadrícula
+const accessoryThumb = { width: 44, height: 32 };
+const backgroundThumb = { width: 56, height: 36, borderRadius: 6 };
 
 // Vestidor (M01)
 export default function VestidorScreen() {
@@ -59,17 +62,16 @@ export default function VestidorScreen() {
           </View>
         </View>
 
-        <View style={styles.lookCard}>
-          <Text style={styles.lookSubtitle}>{vm.selected ? "Vista previa" : "Look Actual"}</Text>
-          <Text style={styles.lookTitle}>{vm.selected ? vm.selected.name : vm.lookName}</Text>
-          <View>
-            <Image source={vm.petImage} style={styles.mascotaImage} resizeMode="contain" />
-            {vm.selected && (
-              <View style={previewBadge}>
-                <PixelIcon name={vm.selected.icon} size={18} color={theme.colors.background} />
-              </View>
-            )}
+        {/* La mascota con su look (o la vista previa) sobre el fondo equipado */}
+        <View style={[styles.lookCard, { overflow: "hidden" }]}>
+          {vm.previewBackground && (
+            <Image source={vm.previewBackground.source} style={[StyleSheet.absoluteFill, { width: "100%", height: "100%" }]} resizeMode="cover" accessibilityIgnoresInvertColors />
+          )}
+          <View style={lookLabel}>
+            <Text style={styles.lookSubtitle}>{vm.selected ? "Vista previa" : "Look Actual"}</Text>
+            <Text style={[styles.lookTitle, { marginBottom: 0 }]}>{vm.selected ? vm.selected.name : vm.lookName}</Text>
           </View>
+          <PetAvatar species={vm.petSpecies} equipped={vm.previewEquipped} size={160} showMood={false} />
         </View>
 
         {/* RDF020 a RDF022: vista previa con equipar / quitar */}
@@ -152,7 +154,16 @@ export default function VestidorScreen() {
                 accessibilityLabel={`${item.name}, ${item.status}`}
               >
                 <View style={styles.itemIconBox}>
-                  <PixelIcon name="chevron-up" size={24} color={theme.colors.textPrimary} />
+                  {vm.itemImage(item) ? (
+                    <Image
+                      source={vm.itemImage(item)!.source}
+                      style={item.category === "Fondo" ? backgroundThumb : accessoryThumb}
+                      resizeMode={item.category === "Fondo" ? "cover" : "contain"}
+                      accessibilityIgnoresInvertColors
+                    />
+                  ) : (
+                    <PixelIcon name="chevron-up" size={24} color={theme.colors.textPrimary} />
+                  )}
                 </View>
                 <Text style={styles.itemName} numberOfLines={2}>
                   {item.name}

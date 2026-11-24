@@ -15,6 +15,7 @@ export interface WardrobeItem {
   equipped: boolean;
   owned: boolean; // false = se compra en la tienda, se gana con un logro o se desbloquea por nivel
   category: WardrobeCategory;
+  asset?: string | null; // Nombre de su imagen en assets/vestidor (ver constants/itemAssets.ts); si falta, se usa el id
 }
 
 // Lo que lleva puesto la mascota en cada parte

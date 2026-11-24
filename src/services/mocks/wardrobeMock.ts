@@ -6,16 +6,20 @@ import { copy, delay, newId } from "./mockUtils";
 // Imitan lo que responde la API (docs/API.md) mientras el módulo no esté conectado.
 
 
+// El id de cada prenda es también el nombre de su imagen (assets/vestidor, ver constants/itemAssets.ts)
 let wardrobe: WardrobeItem[] = [
-  { id: "w-1", name: "Boina de lector", stat: "cultura", icon: "book-open", status: "Equipado", equipped: true, owned: true, category: "Cabeza" },
-  { id: "w-2", name: "Gorro de lana", stat: "enfoque", icon: "focus", status: "Tuyo", equipped: false, owned: true, category: "Cabeza" },
-  { id: "w-3", name: "Banda deportiva", stat: "fisico", icon: "dumbbell", status: "Tuyo", equipped: false, owned: true, category: "Cabeza" },
-  { id: "w-4", name: "Gorra de corredor", stat: "fisico", icon: "dumbbell", status: "120 pts", equipped: false, owned: false, category: "Cabeza" },
-  { id: "w-5", name: "Capucha de monje", stat: "enfoque", icon: "focus", status: "Logro", equipped: false, owned: false, category: "Cabeza" },
-  { id: "w-6", name: "Corona de sabio", stat: "cultura", icon: "book-open", status: "LV 18", equipped: false, owned: false, category: "Cabeza" },
-  { id: "w-7", name: "Lentes de sol", stat: "cultura", icon: "book-open", status: "Tuyo", equipped: false, owned: true, category: "Cara" },
-  { id: "w-8", name: "Bufanda roja", stat: "fisico", icon: "dumbbell", status: "Equipado", equipped: true, owned: true, category: "Cuerpo" },
-  { id: "w-9", name: "Bosque místico", stat: "enfoque", icon: "focus", status: "Equipado", equipped: true, owned: true, category: "Fondo" },
+  { id: "boina-lector", name: "Boina de lector", stat: "cultura", icon: "book-open", status: "Equipado", equipped: true, owned: true, category: "Cabeza" },
+  { id: "gorro-lana", name: "Gorro de lana", stat: "enfoque", icon: "focus", status: "Tuyo", equipped: false, owned: true, category: "Cabeza" },
+  { id: "banda-deportiva", name: "Banda deportiva", stat: "fisico", icon: "dumbbell", status: "Tuyo", equipped: false, owned: true, category: "Cabeza" },
+  { id: "gorra-corredor", name: "Gorra de corredor", stat: "fisico", icon: "dumbbell", status: "120 pts", equipped: false, owned: false, category: "Cabeza" },
+  { id: "capucha-monje", name: "Capucha de monje", stat: "enfoque", icon: "focus", status: "Logro", equipped: false, owned: false, category: "Cabeza" },
+  { id: "corona-sabio", name: "Corona de sabio", stat: "cultura", icon: "book-open", status: "LV 18", equipped: false, owned: false, category: "Cabeza" },
+  { id: "lentes-sol", name: "Lentes de sol", stat: "cultura", icon: "book-open", status: "Tuyo", equipped: false, owned: true, category: "Cara" },
+  { id: "lentes-redondos", name: "Lentes redondos", stat: "cultura", icon: "book-open", status: "Tuyo", equipped: false, owned: true, category: "Cara" },
+  { id: "bufanda-roja", name: "Bufanda roja", stat: "fisico", icon: "dumbbell", status: "Equipado", equipped: true, owned: true, category: "Cuerpo" },
+  { id: "sudadera", name: "Sudadera", stat: "enfoque", icon: "focus", status: "Tuyo", equipped: false, owned: true, category: "Cuerpo" },
+  { id: "fondo-casa", name: "La Casa", stat: "cultura", icon: "book-open", status: "Tuyo", equipped: false, owned: true, category: "Fondo" },
+  { id: "fondo-bosque-mistico", name: "Bosque místico", stat: "enfoque", icon: "focus", status: "Equipado", equipped: true, owned: true, category: "Fondo" },
 ];
 
 // Lo que se ve en el look actual al quitar la prenda de una parte
@@ -24,10 +28,10 @@ const EMPTY_SLOT = "Nada";
 let currentLook: CurrentLook = {
   name: "Lector nocturno",
   slots: {
-    Cabeza: "Gorrito del lectorcito",
-    Cara: "Lentes redonditos",
-    Cuerpo: "Sudadera",
-    Fondo: "Casita",
+    Cabeza: "Boina de lector",
+    Cara: "Nada",
+    Cuerpo: "Bufanda roja",
+    Fondo: "Bosque místico",
   },
 };
 
