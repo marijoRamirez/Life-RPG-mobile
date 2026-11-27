@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ProgressTabs } from "@/components/logros/ProgressTabs";
 import { XpChart } from "@/components/logros/XpChart";
-import { BottomNav } from "@/components/ui/BottomNav";
+import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { theme } from "@/constants/theme";
 import { achievementStyles as styles } from "@/styles/achievements.styles";
 import { ui, UI_COLORS } from "@/styles/ui.styles";
@@ -12,12 +12,13 @@ import { useMonthlyComparisonViewModel } from "@/viewmodels/useMonthlyComparison
 
 // 5.3 Leaderboard personal · Tú vs. tú (M05 · RF018). Sin compararse con otras personas.
 export default function RankingScreen() {
+  const navSpace = useBottomNavSpace();
   const vm = useMonthlyComparisonViewModel();
 
   return (
     <SafeAreaView style={ui.container} edges={["top"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={ui.content}>
+      <ScrollView contentContainerStyle={[ui.content, { paddingBottom: navSpace }]}>
         <View style={{ gap: 2 }}>
           <Text style={ui.subtitle}>{vm.rangeText}</Text>
           <Text style={ui.title}>Tú vs. tú</Text>

@@ -3,7 +3,7 @@ import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "rea
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ChoiceChip } from "@/components/acceso/FormField";
-import { BottomNav } from "@/components/ui/BottomNav";
+import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { ChevronLeftIcon, ChevronRightIcon, StreakIcon } from "@/components/ui/PixelIcons";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { theme } from "@/constants/theme";
@@ -19,12 +19,13 @@ const cellColor = (status: DayStatus | null) =>
 
 // 2.3 Calendario de rachas (M02 · RF009)
 export default function RachasScreen() {
+  const navSpace = useBottomNavSpace();
   const vm = useStreakCalendarViewModel();
 
   return (
     <SafeAreaView style={ui.container} edges={["top"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={ui.content}>
+      <ScrollView contentContainerStyle={[ui.content, { paddingBottom: navSpace }]}>
         <ScreenHeader title="Rachas" />
 
         <View style={[ui.card, styles.streakCard]}>

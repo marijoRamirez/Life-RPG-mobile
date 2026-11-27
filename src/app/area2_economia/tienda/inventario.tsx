@@ -2,7 +2,7 @@ import { Stack, useRouter } from "expo-router";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { BottomNav } from "@/components/ui/BottomNav";
+import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { ClothesIcon, PixelIcon } from "@/components/ui/PixelIcons";
 import { SHOP_COLORS as COLORS } from "@/constants/shopTypes";
 import type { Consumable, OwnedReward } from "@/models/Item";
@@ -11,6 +11,7 @@ import { useInventoryViewModel } from "@/viewmodels/useInventoryViewModel";
 
 // 4.3 Inventario
 export default function InventarioScreen() {
+  const navSpace = useBottomNavSpace();
   const router = useRouter();
   const vm = useInventoryViewModel();
 
@@ -31,7 +32,7 @@ export default function InventarioScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: navSpace }]}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Inventario</Text>

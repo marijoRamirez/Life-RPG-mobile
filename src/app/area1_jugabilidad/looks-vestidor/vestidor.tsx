@@ -2,7 +2,7 @@ import { Stack, useRouter } from "expo-router";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { BottomNav } from "@/components/ui/BottomNav";
+import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { PetAvatar } from "@/components/ui/PetAvatar";
 import { PixelIcon } from "@/components/ui/PixelIcons";
 import { POINT_META, POINT_TYPES } from "@/constants/pointTypes";
@@ -27,13 +27,14 @@ const backgroundThumb = { width: 56, height: 36, borderRadius: 6 };
 
 // Vestidor (M01)
 export default function VestidorScreen() {
+  const navSpace = useBottomNavSpace();
   const router = useRouter();
   const vm = useWardrobeViewModel();
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: navSpace }]}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.headerIcon} onPress={() => router.back()}>
             <PixelIcon name="chevron-left" size={24} color={theme.colors.textPrimary} />

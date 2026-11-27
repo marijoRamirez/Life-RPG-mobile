@@ -30,12 +30,24 @@ const ITEMS: Item[] = [
   { name: "trophy", label: "Progreso", route: "/area2_economia/logros/vitrina" },
 ];
 
+const DOCK_HEIGHT = 68;
+const bottomGap = (insetBottom: number) => Math.max(insetBottom, 10);
+
+// Espacio que cada pantalla deja al final de su contenido para que lo último no quede
+// detrás de la barra (que flota encima): alto de la barra + botones del sistema + aire.
+export function useBottomNavSpace() {
+  const insets = useSafeAreaInsets();
+  return DOCK_HEIGHT + bottomGap(insets.bottom) + 20;
+}
+
 export function BottomNav({ activeTab }: { activeTab: PixelIconName }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.wrap, { paddingBottom: Math.max(insets.bottom, 10) }]}>
+    // Flota sobre el contenido (como en la PWA): lo de atrás se sigue viendo a los lados.
+    // box-none: los toques fuera de la barra llegan al contenido.
+    <View style={[styles.wrap, { paddingBottom: bottomGap(insets.bottom) }]} pointerEvents="box-none">
       <View style={styles.dock} accessibilityRole="tablist">
         {ITEMS.map(({ name, label, route }) => {
           const isActive = activeTab === name;
@@ -66,16 +78,17 @@ export function BottomNav({ activeTab }: { activeTab: PixelIconName }) {
 }
 
 const styles = StyleSheet.create({
-  // Deja arriba el espacio que ocupa el botón activo al sobresalir
   wrap: {
-    paddingTop: 30,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
     paddingHorizontal: 8,
-    backgroundColor: "transparent",
   },
   dock: {
     flexDirection: "row",
     alignItems: "flex-end",
-    height: 68,
+    height: DOCK_HEIGHT,
     paddingHorizontal: 4,
     paddingBottom: 9,
     borderWidth: 2,

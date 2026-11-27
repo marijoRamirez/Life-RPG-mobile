@@ -2,7 +2,7 @@ import { Stack, useRouter } from "expo-router";
 import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { BottomNav } from "@/components/ui/BottomNav";
+import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { AddIcon, CalendarIcon, CheckIcon, EditIcon, FocusIcon } from "@/components/ui/PixelIcons";
 import { theme } from "@/constants/theme";
 import { habitStyles as styles, TYPE_COLOR } from "@/styles/habits.styles";
@@ -11,6 +11,7 @@ import { useHabitCheckinViewModel } from "@/viewmodels/useHabitCheckinViewModel"
 
 // 2.1 Check-in interactivo (M02 · RF007)
 export default function CheckinScreen() {
+  const navSpace = useBottomNavSpace();
   const router = useRouter();
   const vm = useHabitCheckinViewModel();
   // Los hábitos con tiempo de enfoque pasan primero por el Modo concentración (RDF028)
@@ -22,7 +23,7 @@ export default function CheckinScreen() {
   return (
     <SafeAreaView style={ui.container} edges={["top"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={ui.content}>
+      <ScrollView contentContainerStyle={[ui.content, { paddingBottom: navSpace }]}>
         <View style={ui.header}>
           <View style={{ gap: 2, flexShrink: 1 }}>
             <Text style={ui.subtitle}>{vm.dateText}</Text>

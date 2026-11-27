@@ -2,7 +2,7 @@ import { Stack, useRouter } from "expo-router";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { BottomNav } from "@/components/ui/BottomNav";
+import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { AddIcon, PixelIcon } from "@/components/ui/PixelIcons";
 import { POINT_META, POINT_TYPES } from "@/constants/pointTypes";
 import { FILTERS, SHOP_COLORS as COLORS } from "@/constants/shopTypes";
@@ -12,6 +12,7 @@ import { useShopShowcaseViewModel } from "@/viewmodels/useShopShowcaseViewModel"
 
 // 4.1 Escaparate
 export default function EscaparateScreen() {
+  const navSpace = useBottomNavSpace();
   const router = useRouter();
   const vm = useShopShowcaseViewModel();
 
@@ -34,7 +35,7 @@ export default function EscaparateScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: navSpace }]}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Tienda</Text>

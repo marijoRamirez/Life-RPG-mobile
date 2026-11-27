@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FilterPills, type PillOption } from "@/components/misiones/FilterPills";
 import { VictoryModal } from "@/components/misiones/VictoryModal";
-import { BottomNav } from "@/components/ui/BottomNav";
+import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { PixelIcon } from "@/components/ui/PixelIcons";
 import { MISSION_COLORS, MISSION_TYPE_META, MISSION_TYPES } from "@/constants/missionTypes";
 import { theme } from "@/constants/theme";
@@ -28,6 +28,7 @@ const TYPE_OPTIONS: PillOption<HistoryTypeFilter>[] = [
 
 // 3.3 Validación e historial (RF012)
 export default function HistorialMisionesScreen() {
+  const navSpace = useBottomNavSpace();
   const router = useRouter();
   const { sessionId } = useLocalSearchParams<{ sessionId?: string }>();
   const vm = useMissionHistoryViewModel(sessionId);
@@ -45,7 +46,7 @@ export default function HistorialMisionesScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: navSpace }]}>
         <View style={styles.header}>
           <TouchableOpacity style={shared.iconButton} onPress={goBack} accessibilityRole="button" accessibilityLabel="Volver">
             <PixelIcon name="chevron-left" size={16} color={theme.colors.textPrimary} />

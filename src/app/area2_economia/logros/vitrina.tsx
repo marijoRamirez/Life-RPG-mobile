@@ -3,7 +3,7 @@ import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "rea
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ProgressTabs } from "@/components/logros/ProgressTabs";
-import { BottomNav } from "@/components/ui/BottomNav";
+import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { LockIcon, PixelIcon, StarIcon } from "@/components/ui/PixelIcons";
 import { theme } from "@/constants/theme";
 import { achievementStyles as styles } from "@/styles/achievements.styles";
@@ -12,6 +12,7 @@ import { useAchievementsViewModel } from "@/viewmodels/useAchievementsViewModel"
 
 // 5.1 Vitrina de medallas (M05 · RF016)
 export default function VitrinaScreen() {
+  const navSpace = useBottomNavSpace();
   const router = useRouter();
   const vm = useAchievementsViewModel();
   const open = (id: string) => router.push({ pathname: "/area2_economia/logros/ficha", params: { id } });
@@ -19,7 +20,7 @@ export default function VitrinaScreen() {
   return (
     <SafeAreaView style={ui.container} edges={["top"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={ui.content}>
+      <ScrollView contentContainerStyle={[ui.content, { paddingBottom: navSpace }]}>
         <View style={styles.headerRow}>
           <View style={{ gap: 2 }}>
             <Text style={ui.subtitle}>{vm.countText}</Text>

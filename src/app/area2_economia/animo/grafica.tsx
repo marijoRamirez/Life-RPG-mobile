@@ -3,7 +3,7 @@ import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "rea
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { MoodChart } from "@/components/animo/MoodChart";
-import { BottomNav } from "@/components/ui/BottomNav";
+import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { PixelIcon } from "@/components/ui/PixelIcons";
 import { MOOD_COLORS } from "@/constants/moodTypes";
 import { theme } from "@/constants/theme";
@@ -18,13 +18,14 @@ const PERIODS: { key: MoodPeriod; label: string }[] = [
 
 // 6.2 Gráfica de ánimo (RF020)
 export default function GraficaAnimoScreen() {
+  const navSpace = useBottomNavSpace();
   const router = useRouter();
   const vm = useMoodChartViewModel();
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: navSpace }]}>
         <View style={styles.header}>
           <View style={styles.headerText}>
             <Text style={shared.subtitle}>{vm.rangeText}</Text>
