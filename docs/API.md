@@ -164,7 +164,7 @@ Modelo: `Mission.ts`.
 | `GET /misiones/:id` | — | `Mission` | `404` si ya no está activa. |
 | `POST /misiones` | `NewMissionInput` | `Mission` | RDF037. El servidor calcula `reward` (RDF038). Título obligatorio. |
 | `POST /misiones/:id/sesiones` | — | `FocusSession` | RDF039. `locksDevice` es `true` solo en misiones de enfoque. |
-| `POST /sesiones/:id/fallar` | `{ "reason": "rendicion" }` | `204` | RDF040. `reason`: `"rendicion"` o `"salio_app"`. La misión pasa al historial como fallida. |
+| `POST /sesiones/:id/fallar` | `{ "reason": "rendicion" }` | `204` | RDF040. `reason`: `"rendicion"` o `"salio_app"` (salir de la app falla cualquier tipo de misión). La misión pasa al historial como fallida. |
 | `POST /sesiones/:id/finalizar` | — | `SessionOutcome` | RDF041. `claimed: false` cuando falta la validación manual. |
 | `GET /sesiones/:id/resultado` | — | `SessionOutcome` | `404` si la sesión no existe. |
 | `POST /sesiones/:id/validar` | — | `SessionOutcome` | RDF043. Confirma manualmente y entrega la recompensa. |

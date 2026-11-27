@@ -128,9 +128,7 @@ export default function ModoConcentracionScreen() {
             <Text style={shared.secondaryButtonText}>Rendirse</Text>
           </TouchableOpacity>
           <Text style={styles.note}>
-            {vm.locksDevice
-              ? "Si te rindes o sales de la app, la misión queda como fallida y no ganas puntos."
-              : "Si te rindes, la misión queda como fallida y no ganas puntos."}
+            Si te rindes o sales de la app, la misión queda como fallida y no ganas puntos.
           </Text>
           {__DEV__ && (
             <TouchableOpacity style={styles.devButton} onPress={vm.finishNow}>
