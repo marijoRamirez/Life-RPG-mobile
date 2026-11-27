@@ -4,8 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { PixelIcon } from "@/components/ui/PixelIcons";
 import { ENERGY_MAX, MOOD_COLORS, MOOD_FACTORS, MOOD_LEVELS, MOOD_META, MOOD_XP_REWARD } from "@/constants/moodTypes";
+import { petImage } from "@/constants/petTypes";
 import { theme } from "@/constants/theme";
 import { useMoodRegisterViewModel } from "@/viewmodels/useMoodRegisterViewModel";
+import { useSession } from "@/viewmodels/SessionProvider";
 import { moodShared as shared, registerStyles as styles } from "@/styles/mood.styles";
 
 const ENERGY_STEPS = Array.from({ length: ENERGY_MAX }, (_, i) => i + 1);
@@ -13,6 +15,7 @@ const ENERGY_STEPS = Array.from({ length: ENERGY_MAX }, (_, i) => i + 1);
 // 6.1 Registro rápido (RF019)
 export default function RegistroAnimoScreen() {
   const router = useRouter();
+  const session = useSession();
   const vm = useMoodRegisterViewModel();
   const saved = vm.xpAwarded !== null;
 
@@ -49,7 +52,8 @@ export default function RegistroAnimoScreen() {
         </View>
 
         <View style={styles.greetingRow}>
-          <Image source={require("@/assets/images/dragon.png")} style={styles.mascot} resizeMode="contain" />
+          {/* La mascota que el jugador eligió (antes siempre salía el dragón) */}
+          <Image source={petImage(session.account?.pet)} style={styles.mascot} resizeMode="contain" />
           <View style={[shared.card, styles.bubble]}>
             <Text style={styles.bubbleText}>¡Hola! ¿Cómo te sientes hoy?</Text>
           </View>
