@@ -7,9 +7,10 @@ import { failSession, finishSession, getMission, startSession } from "@/services
 // ViewModel de 3.2 Modo concentración (RF011).
 //
 // Bloqueo: mientras la sesión está activa se intercepta el botón "atrás" de
-// Android y, en misiones de Enfoque, salir de la app marca la sesión como
-// fallida (RDF040). Fijar la pantalla de verdad (Lock Task / Screen Pinning,
-// RDF039) necesita un módulo nativo y un development build; no existe en Expo Go.
+// Android y salir de la app marca la sesión como fallida (RDF040), en cualquier
+// tipo de misión. `locksDevice` (solo Enfoque) indica además "Pantalla fijada".
+// Fijar la pantalla de verdad (Lock Task / Screen Pinning, RDF039) necesita un
+// módulo nativo y un development build; no existe en Expo Go.
 
 export type FocusStatus = "cargando" | "activa" | "terminada" | "fallida" | "error";
 
@@ -65,18 +66,42 @@ export function useFocusSessionViewModel(missionId: string | undefined) {
   const elapsedMs = session ? Math.min(totalMs, Math.max(0, now - Date.parse(session.startedAt))) : 0;
   const remainingMs = totalMs - elapsedMs;
 
-  // RDF040: rendirse o salir de la app, sin puntos
+  // Aviso al servidor de que la sesión falló. Si no se pudo (sin señal al salir de la
+  // app, servidor dormido…) queda pendiente y se reintenta al volver a la app.
+  const pendingFailRef = useRef<{ sessionId: string; reason: FailReason } | null>(null);
+  const reportFail = useCallback(async () => {
+    const pending = pendingFailRef.current;
+    if (!pending) return;
+    try {
+      await failSession(pending.sessionId, pending.reason);
+      if (pendingFailRef.current === pending) pendingFailRef.current = null;
+    } catch {
+      // Se reintenta en el siguiente regreso a la app
+    }
+  }, []);
+
+  // RDF040: rendirse o salir de la app, sin puntos.
+  // La sesión se marca fallida al instante (el contador se detiene aunque no haya red);
+  // antes se esperaba la respuesta del servidor y, si fallaba, el contador seguía corriendo.
   const fail = useCallback(
-    async (reason: FailReason) => {
+    (reason: FailReason) => {
       if (!session || closingRef.current) return;
       closingRef.current = true;
       setGiveUpOpen(false);
-      await failSession(session.id, reason);
       setFailReason(reason);
       setStatus("fallida");
+      pendingFailRef.current = { sessionId: session.id, reason };
+      void reportFail();
     },
-    [session],
+    [session, reportFail],
   );
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (next) => {
+      if (next === "active") void reportFail();
+    });
+    return () => sub.remove();
+  }, [reportFail]);
 
   // RDF041: al terminar el temporizador se registra la sesión y se otorgan los puntos
   const finish = useCallback(async () => {
@@ -95,10 +120,12 @@ export function useFocusSessionViewModel(missionId: string | undefined) {
     if (status === "activa" && session && remainingMs <= 0) void finish();
   }, [status, session, remainingMs, finish]);
 
+  // RDF040: salir de la app (inicio, otra app, apagar la pantalla) falla la sesión, en
+  // cualquier tipo de misión.
   useEffect(() => {
-    if (status !== "activa" || !session?.locksDevice) return;
+    if (status !== "activa" || !session) return;
     const sub = AppState.addEventListener("change", (next) => {
-      if (next === "background") void fail("salio_app");
+      if (next === "background") fail("salio_app");
     });
     return () => sub.remove();
   }, [status, session, fail]);

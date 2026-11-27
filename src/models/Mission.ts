@@ -36,7 +36,7 @@ export interface FocusSession {
   missionId: string;
   startedAt: string; // ISO 8601
   durationMin: number;
-  locksDevice: boolean; // Solo las misiones de Enfoque bloquean el celular
+  locksDevice: boolean; // Solo Enfoque muestra "Pantalla fijada"; salir de la app falla cualquier misión
 }
 
 // Datos que llegan del smartwatch / Health Connect
