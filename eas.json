@@ -1,0 +1,30 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "demo": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_AUTH_MODE": "mock-login",
+        "EXPO_PUBLIC_DEV_USER_ID": "u-1"
+      }
+    },
+    "render": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "environment": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://liferpg-backend-56d5.onrender.com/api/v1",
+        "EXPO_PUBLIC_API_MODULES": "usuarios,tamagotchi,vestidor,habitos,misiones,tienda,logros,animo",
+        "EXPO_PUBLIC_AUTH_MODE": "firebase"
+      }
+    }
+  }
+}

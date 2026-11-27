@@ -198,3 +198,39 @@ pnpm exec expo start --clear
 > `npx pnpm@9.15.0 install` y luego `npx pnpm@9.15.0 exec expo start --clear`.
 
 Una vez que el servidor esté corriendo, escanea el código QR con la app **Expo Go** en tu celular físico, o presiona `a` para abrir en el emulador de Android / `i` para el simulador de iOS.
+
+### Generar el APK (EAS)
+
+`eas.json` tiene dos perfiles. El `.env` **no** se usa al compilar en EAS (git lo ignora): cada perfil
+trae sus variables.
+
+| Perfil | Backend | Inicio de sesión | Para qué |
+| :-- | :-- | :-- | :-- |
+| `demo` | Ninguno: todo con datos simulados | `mock-login` (cuenta de prueba) | Enseñar la app sin servidor. |
+| `render` | `https://liferpg-backend-56d5.onrender.com/api/v1`, todos los módulos conectados | Firebase real | La app completa contra el backend en la nube. |
+
+```bash
+# APK de demostración (datos simulados)
+eas build -p android --profile demo
+
+# APK conectado a Render
+eas build -p android --profile render
+```
+
+Antes de compilar `render`:
+
+1. **Variables de Firebase.** El perfil lee las `EXPO_PUBLIC_FIREBASE_*` del entorno `preview` del proyecto en
+   expo.dev (no van en el repo). Se cargan una vez, con los valores de la app web de Firebase
+   (Consola de Firebase › Configuración del proyecto › Tus apps):
+   ```bash
+   eas env:create --environment preview --name EXPO_PUBLIC_FIREBASE_API_KEY --value <valor> --visibility plaintext
+   # …y lo mismo para AUTH_DOMAIN, PROJECT_ID, STORAGE_BUCKET, MESSAGING_SENDER_ID y APP_ID
+   ```
+   Sin `EXPO_PUBLIC_FIREBASE_API_KEY` la app cae al modo de prueba y el backend responde 401 (en producción
+   solo acepta sesiones de Firebase).
+2. **`google-services.json`** en la raíz del proyecto (lo pide `app.json`). No está en el repo: pídelo al equipo.
+3. **Despertar el backend.** Render apaga el servicio si nadie lo usa; la primera petición tarda ~40 s.
+   Abre `https://liferpg-backend-56d5.onrender.com/api/v1/estado` antes de presentar.
+
+Los módulos conectados se fijan al compilar (`EXPO_PUBLIC_API_MODULES`); la dirección del servidor se puede
+cambiar después en la app desde **Ajustes › Servidor**.
