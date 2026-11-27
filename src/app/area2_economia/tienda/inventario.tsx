@@ -4,8 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { ClothesIcon, PixelIcon } from "@/components/ui/PixelIcons";
+import { COMING_SOON, missingArt } from "@/constants/itemAssets";
 import { SHOP_COLORS as COLORS } from "@/constants/shopTypes";
 import type { Consumable, OwnedReward } from "@/models/Item";
+import { comingSoonStyles as SOON } from "@/styles/comingSoon.styles";
 import { inventoryStyles as styles } from "@/styles/shop.styles";
 import { useInventoryViewModel } from "@/viewmodels/useInventoryViewModel";
 
@@ -32,7 +34,7 @@ export default function InventarioScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: navSpace }]}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Inventario</Text>
@@ -88,21 +90,30 @@ export default function InventarioScreen() {
         {/* Ropa */}
         <Text style={styles.sectionLabel}>ROPA DEL TAMAGOTCHI</Text>
         <View style={styles.clothingRow}>
-          {vm.clothing.map((c) => (
-            <TouchableOpacity
-              key={c.id}
-              style={[styles.clothingTile, c.equipped && styles.clothingTileActive]}
-              activeOpacity={0.8}
-              onPress={() => vm.toggle(c.id)}
-            >
-              <PixelIcon name={c.icon} size={32} color={COLORS.text} />
-              <Text style={styles.clothingName}>{c.name}</Text>
-            </TouchableOpacity>
-          ))}
+          {vm.clothing.map((c) => {
+            // Sin dibujo en la app: tachada y sin poder ponerse (la mascota no cambiaría)
+            const soon = missingArt(c);
+            return (
+              <TouchableOpacity
+                key={c.id}
+                style={[styles.clothingTile, c.equipped && styles.clothingTileActive, soon && SOON.card]}
+                activeOpacity={0.8}
+                onPress={() => vm.toggle(c.id)}
+                disabled={soon}
+                accessibilityState={{ disabled: soon, selected: c.equipped }}
+                accessibilityLabel={soon ? `${c.name}, ${COMING_SOON}` : c.name}
+              >
+                <PixelIcon name={c.icon} size={32} color={COLORS.text} />
+                <Text style={[styles.clothingName, soon && SOON.name]}>{c.name}</Text>
+                {soon && <Text style={SOON.label}>{COMING_SOON}</Text>}
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
 
-      <View style={styles.footer}>
+      {/* El pie queda arriba de la barra flotante */}
+      <View style={[styles.footer, { paddingBottom: navSpace }]}>
         {/* RDF059: historial de canjes */}
         <TouchableOpacity
           style={[styles.wardrobeButton, { marginBottom: 8 }]}

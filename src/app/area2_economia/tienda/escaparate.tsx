@@ -5,8 +5,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { AddIcon, PixelIcon } from "@/components/ui/PixelIcons";
 import { POINT_META, POINT_TYPES } from "@/constants/pointTypes";
+import { COMING_SOON, missingArt } from "@/constants/itemAssets";
 import { FILTERS, SHOP_COLORS as COLORS } from "@/constants/shopTypes";
 import type { ShopItem } from "@/models/Item";
+import { comingSoonStyles as SOON } from "@/styles/comingSoon.styles";
 import { showcaseStyles as styles } from "@/styles/shop.styles";
 import { useShopShowcaseViewModel } from "@/viewmodels/useShopShowcaseViewModel";
 
@@ -16,8 +18,12 @@ export default function EscaparateScreen() {
   const router = useRouter();
   const vm = useShopShowcaseViewModel();
 
+  // Ropa o fondo sin dibujo en la app: tachado y sin poder comprarse
+  const comingSoon = (item: ShopItem) => Boolean(item.category) && missingArt(item);
+
   // Confirmaciones de la compra (la validación la hace el ViewModel)
   const handlePress = (item: ShopItem) => {
+    if (comingSoon(item)) return;
     const meta = POINT_META[item.pointType];
     const missing = vm.missingFor(item);
 
@@ -35,7 +41,7 @@ export default function EscaparateScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: navSpace }]}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Tienda</Text>
@@ -82,12 +88,16 @@ export default function EscaparateScreen() {
           )}
           {vm.visibleItems.map((item) => {
             const meta = POINT_META[item.pointType];
+            const soon = comingSoon(item);
             return (
               <TouchableOpacity
                 key={item.id}
                 activeOpacity={0.8}
-                style={[styles.card, vm.isLocked(item) && styles.cardLocked]}
+                style={[styles.card, (vm.isLocked(item) || soon) && styles.cardLocked, soon && SOON.card]}
                 onPress={() => handlePress(item)}
+                disabled={soon}
+                accessibilityState={{ disabled: soon }}
+                accessibilityLabel={soon ? `${item.name}, ${COMING_SOON}` : undefined}
               >
                 <View style={styles.iconBox}>
                   <PixelIcon name={item.icon} size={32} color={COLORS.text} />
@@ -108,21 +118,26 @@ export default function EscaparateScreen() {
                     </TouchableOpacity>
                   )}
                 </View>
-                <Text style={styles.itemName} numberOfLines={1}>
+                <Text style={[styles.itemName, soon && SOON.name]} numberOfLines={1}>
                   {item.name}
                 </Text>
-                <View style={styles.priceRow}>
-                  <PixelIcon name={meta.icon} size={16} color={COLORS.amber} />
-                  <Text style={styles.priceText}>{item.price}</Text>
-                  <Text style={styles.priceType}>{meta.label}</Text>
-                </View>
+                {soon ? (
+                  <Text style={SOON.label}>{COMING_SOON}</Text>
+                ) : (
+                  <View style={styles.priceRow}>
+                    <PixelIcon name={meta.icon} size={16} color={COLORS.amber} />
+                    <Text style={styles.priceText}>{item.price}</Text>
+                    <Text style={styles.priceType}>{meta.label}</Text>
+                  </View>
+                )}
               </TouchableOpacity>
             );
           })}
         </View>
       </ScrollView>
 
-      <View style={styles.footer}>
+      {/* El pie queda arriba de la barra flotante */}
+      <View style={[styles.footer, { paddingBottom: navSpace }]}>
         <TouchableOpacity style={styles.createButton} onPress={() => router.push("/area2_economia/tienda/detalle")}>
           <AddIcon size={16} color={COLORS.text} />
           <Text style={styles.createText}>Crear recompensa</Text>

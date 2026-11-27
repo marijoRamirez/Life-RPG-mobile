@@ -51,3 +51,9 @@ export const itemAsset = (name: string | null | undefined): ItemAsset | null =>
 
 // Nombre de la imagen de un artículo: su campo `asset` o, si no viene, su `id`
 export const assetName = (item: { id: string; asset?: string | null }) => item.asset ?? item.id;
+
+// Prenda o fondo que todavía no tiene dibujo en la app: se muestra tachada como
+// "Próximamente" y no se puede comprar ni equipar (la mascota no cambiaría). En cuanto
+// se agrega su imagen a ITEM_ASSETS deja de estarlo, sin tocar nada más.
+export const COMING_SOON = "Próximamente";
+export const missingArt = (item: { id: string; asset?: string | null }) => !itemAsset(assetName(item));
