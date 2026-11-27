@@ -3,6 +3,7 @@
 
 import type { PixelIconName } from "@/components/ui/PixelIcons";
 import type { PointType, Wallet } from "@/models/common";
+import type { WardrobeCategory } from "@/models/Wardrobe";
 
 export type ItemIconName = PixelIconName;
 
@@ -15,6 +16,7 @@ export interface ShopItem {
   pointType: PointType;
   isCustom?: boolean; // Recompensa creada por el usuario → badge "TUYA"
   asset?: string | null; // Fondos y accesorios: nombre de su imagen (constants/itemAssets.ts)
+  category?: WardrobeCategory | null; // Parte del cuerpo si es ropa o fondo; null si no
 }
 
 // Respuesta al comprar: puntos que quedan y la recompensa que entra al inventario

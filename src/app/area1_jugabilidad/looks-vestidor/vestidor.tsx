@@ -5,8 +5,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { PetAvatar } from "@/components/ui/PetAvatar";
 import { PixelIcon } from "@/components/ui/PixelIcons";
+import { COMING_SOON } from "@/constants/itemAssets";
 import { POINT_META, POINT_TYPES } from "@/constants/pointTypes";
 import { theme } from "@/constants/theme";
+import { comingSoonStyles as SOON } from "@/styles/comingSoon.styles";
 import { wardrobeStyles as styles } from "@/styles/looks.styles";
 import { useWardrobeViewModel } from "@/viewmodels/useWardrobeViewModel";
 
@@ -142,44 +144,55 @@ export default function VestidorScreen() {
         {/* Cuadrícula de objetos filtrada */}
         <View style={styles.gridContainer}>
           {vm.filteredItems.length > 0 ? (
-            vm.filteredItems.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={[
-                  styles.itemCard,
-                  item.equipped && styles.itemCardActive,
-                  vm.selected?.id === item.id && { borderColor: theme.colors.yellow, borderWidth: 2 },
-                ]}
-                onPress={() => vm.select(item)}
-                accessibilityRole="button"
-                accessibilityLabel={`${item.name}, ${item.status}`}
-              >
-                <View style={styles.itemIconBox}>
-                  {vm.itemImage(item) ? (
-                    <Image
-                      source={vm.itemImage(item)!.source}
-                      style={item.category === "Fondo" ? backgroundThumb : accessoryThumb}
-                      resizeMode={item.category === "Fondo" ? "cover" : "contain"}
-                      accessibilityIgnoresInvertColors
-                    />
-                  ) : (
-                    <PixelIcon name="chevron-up" size={24} color={theme.colors.textPrimary} />
-                  )}
-                </View>
-                <Text style={styles.itemName} numberOfLines={2}>
-                  {item.name}
-                </Text>
+            vm.filteredItems.map((item) => {
+              const image = vm.itemImage(item);
+              // Sin dibujo en la app: tachada y sin poder elegirse (la mascota no cambiaría)
+              const soon = !image;
+              return (
+                <TouchableOpacity
+                  key={item.id}
+                  style={[
+                    styles.itemCard,
+                    item.equipped && styles.itemCardActive,
+                    vm.selected?.id === item.id && { borderColor: theme.colors.yellow, borderWidth: 2 },
+                    soon && SOON.card,
+                  ]}
+                  onPress={() => vm.select(item)}
+                  disabled={soon}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: soon }}
+                  accessibilityLabel={`${item.name}, ${soon ? COMING_SOON : item.status}`}
+                >
+                  <View style={styles.itemIconBox}>
+                    {image ? (
+                      <Image
+                        source={image.source}
+                        style={item.category === "Fondo" ? backgroundThumb : accessoryThumb}
+                        resizeMode={item.category === "Fondo" ? "cover" : "contain"}
+                        accessibilityIgnoresInvertColors
+                      />
+                    ) : (
+                      <PixelIcon name={item.icon} size={24} color={theme.colors.textSecondary} />
+                    )}
+                  </View>
+                  <Text style={[styles.itemName, soon && SOON.name]} numberOfLines={2}>
+                    {item.name}
+                  </Text>
 
-                <View style={styles.itemStatRow}>
-                  <PixelIcon name={item.icon} size={10} color={theme.colors.textSecondary} />
-                  <Text style={styles.itemStatText}>{POINT_META[item.stat].label}</Text>
-                </View>
+                  {/* Tipo de puntos de la prenda, con su ícono */}
+                  <View style={styles.itemStatRow}>
+                    <PixelIcon name={POINT_META[item.stat].icon} size={10} color={theme.colors.textSecondary} />
+                    <Text style={styles.itemStatText}>{POINT_META[item.stat].label}</Text>
+                  </View>
 
-                <View style={[styles.badge, item.equipped && styles.badgeEquipped]}>
-                  <Text style={[styles.badgeText, item.equipped && styles.badgeTextEquipped]}>{item.status}</Text>
-                </View>
-              </TouchableOpacity>
-            ))
+                  <View style={[styles.badge, item.equipped && !soon && styles.badgeEquipped]}>
+                    <Text style={[styles.badgeText, item.equipped && !soon && styles.badgeTextEquipped]}>
+                      {soon ? COMING_SOON : item.status}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })
           ) : (
             !vm.loading && (
               <View style={styles.emptyState}>
