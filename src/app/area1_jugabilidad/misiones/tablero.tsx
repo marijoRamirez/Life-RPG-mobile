@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { FilterPills, type PillOption } from "@/components/misiones/FilterPills";
 import { MissionCard } from "@/components/misiones/MissionCard";
 import { NewMissionModal } from "@/components/misiones/NewMissionModal";
-import { BottomNav } from "@/components/ui/BottomNav";
+import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { PixelIcon } from "@/components/ui/PixelIcons";
 import { MISSION_TYPE_META, MISSION_TYPES } from "@/constants/missionTypes";
 import { theme } from "@/constants/theme";
@@ -20,6 +20,7 @@ const FILTERS: PillOption<MissionFilter>[] = [
 
 // 3.1 Tablero de selección (RF010)
 export default function TableroMisionesScreen() {
+  const navSpace = useBottomNavSpace();
   const router = useRouter();
   const vm = useMissionBoardViewModel();
 
@@ -35,7 +36,7 @@ export default function TableroMisionesScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: navSpace }]}>
         <View style={styles.header}>
           <View style={styles.headerText}>
             <Text style={styles.count}>{countLabel}</Text>

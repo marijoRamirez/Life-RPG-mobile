@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { BottomNav } from "@/components/ui/BottomNav";
+import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { PetAvatar } from "@/components/ui/PetAvatar";
 import { CheckIcon, ClothesIcon, FocusIcon, HeartIcon, PixelIcon, SettingsIcon, type PixelIconName } from "@/components/ui/PixelIcons";
 import { homeStyles as styles } from "@/styles/home.styles";
@@ -10,12 +10,13 @@ import { useTamagotchiViewModel } from "@/viewmodels/useTamagotchiViewModel";
 
 // Casa / HUD principal (M01)
 export default function HUDPrincipalScreen() {
+  const navSpace = useBottomNavSpace();
   const router = useRouter();
   const vm = useTamagotchiViewModel();
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: navSpace }]}>
         <View style={styles.header}>
           {/* M01: el avatar abre Mi perfil; el engrane, Ajustes */}
           <TouchableOpacity

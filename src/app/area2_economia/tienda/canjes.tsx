@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { BottomNav } from "@/components/ui/BottomNav";
+import { BottomNav, useBottomNavSpace } from "@/components/ui/BottomNav";
 import { PixelIcon } from "@/components/ui/PixelIcons";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { theme } from "@/constants/theme";
@@ -11,12 +11,13 @@ import { useRedemptionHistoryViewModel } from "@/viewmodels/useRedemptionHistory
 
 // 4.3 Inventario › Historial de canjes (M04 · RDF059)
 export default function CanjesScreen() {
+  const navSpace = useBottomNavSpace();
   const vm = useRedemptionHistoryViewModel();
 
   return (
     <SafeAreaView style={ui.container} edges={["top"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={ui.content}>
+      <ScrollView contentContainerStyle={[ui.content, { paddingBottom: navSpace }]}>
         <ScreenHeader title="Historial de canjes" />
         <Text style={ui.subtitle}>Las recompensas y consumibles que ya disfrutaste.</Text>
         {vm.loading && <ActivityIndicator color={theme.colors.green} />}
